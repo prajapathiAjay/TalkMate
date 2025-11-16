@@ -11,7 +11,7 @@ const Chat = () => {
   } = useForm({
     resolver: yupResolver(yup.object().shape({})),
   });
-
+  const [currentUser, setCurrentUser] = useState("");
   const [messages, setMessages] = useState([
     {
       sender: "Alice",
@@ -31,9 +31,9 @@ const Chat = () => {
     },
   ]);
 
-  useEffect(() => {
-    socket.on("userJoined", ({ userName }) => {
+  const handleUserJoined=({ userName }) => {
       console.log("User Joined:", userName);
+
       setMessages((prevMessages) => [
         ...prevMessages,
         {
@@ -45,9 +45,13 @@ const Chat = () => {
           }),
         },
       ]);
-    });
+    }
 
-    socket.on("message", ({ userName, message }) => {
+    const handleJoinSuccess=({ userName }) => {
+      setCurrentUser(userName);
+    }
+
+    const handleMessage=({ userName, message }) => {
       setMessages((prevMessages) => [
         ...prevMessages,
         {
@@ -59,11 +63,24 @@ const Chat = () => {
           }),
         },
       ]);
-    });
+    }
+
+  useEffect(() => {
+    socket.on("userJoined", handleUserJoined);
+    socket.on("joinSuccess", handleJoinSuccess );
+    socket.on("message",handleMessage );
 
     socket.on("connect_error", (error) => {
       console.error("Socket connection error:", error.message);
     });
+
+
+
+      return () => {
+    socket.off("userJoined", handleUserJoined);
+    socket.off("joinSuccess", handleJoinSuccess);
+    socket.off("message", handleMessage);
+  };
   }, []);
 
   const [newMsg, setNewMsg] = useState("");
@@ -232,28 +249,28 @@ const Chat = () => {
             <div
               key={index}
               className={`flex ${
-                msg.sender === "You" ? "justify-end" : "justify-start"
+                msg.sender === currentUser ? "justify-end" : "justify-start"
               }`}
             >
               <div className="flex max-w-xl">
-                {msg.sender !== "You" && (
+                {msg.sender !== currentUser && (
                   <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white text-xs font-bold mr-2 mt-1">
                     {msg.sender}
                   </div>
                 )}
                 <div
                   className={`flex flex-col ${
-                    msg.sender === "You" ? "items-end" : "items-start"
+                    msg.sender === currentUser ? "items-end" : "items-start"
                   }`}
                 >
                   <div
                     className={`px-4 py-3 rounded-2xl shadow-sm ${
-                      msg.sender === "You"
+                      msg.sender === currentUser
                         ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-br-none"
                         : "bg-white text-gray-800 rounded-bl-none border border-gray-100"
                     }`}
                   >
-                    {msg.sender !== "You" && (
+                    {msg.sender !== currentUser && (
                       <p className="font-semibold text-sm mb-1">{msg.sender}</p>
                     )}
                     <p className="text-sm">{msg.text}</p>
