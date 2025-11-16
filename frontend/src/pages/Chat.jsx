@@ -31,36 +31,13 @@ const Chat = () => {
     },
   ]);
 
-  // useEffect(() => {
-  //   socket.on("userJoined", ({userName}) => {
-  //     console.log("User Joined:", userName);
-  //     setMessages((prevMessages) => [
-  //       ...prevMessages,
-  //       {
-  //         sender: "System",
-  //         text: `${userName} has joined the chat.`,
-  //         time: new Date().toLocaleTimeString([], {
-  //           hour: "2-digit",
-  //           minute: "2-digit",
-  //         }),
-  //       },
-  //     ]);
-  //   });
-  //   return () => {
-  //     socket.off("userJoined");
-  //   };
-  // }, []);
-
   useEffect(() => {
-  // socket.on("connect", () => {
-  //   console.log("Connected to socket:", socket.id);
-  // });
-socket.on("userJoined", ({userName}) => {
+    socket.on("userJoined", ({ userName }) => {
       console.log("User Joined:", userName);
       setMessages((prevMessages) => [
         ...prevMessages,
         {
-          type:"joining message",
+          type: "joining message",
           text: `${userName} has joined the chat.`,
           time: new Date().toLocaleTimeString([], {
             hour: "2-digit",
@@ -69,11 +46,25 @@ socket.on("userJoined", ({userName}) => {
         },
       ]);
     });
-  socket.on("connect_error", (error) => {
-    console.error("Socket connection error:", error.message);
-  });
-}, []);
 
+    socket.on("message", ({ userName, message }) => {
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          sender: userName,
+          text: message,
+          time: new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        },
+      ]);
+    });
+
+    socket.on("connect_error", (error) => {
+      console.error("Socket connection error:", error.message);
+    });
+  }, []);
 
   const [newMsg, setNewMsg] = useState("");
   const messagesEndRef = useRef(null);
@@ -96,20 +87,21 @@ socket.on("userJoined", ({userName}) => {
 
   const sendMessage = () => {
     if (!newMsg.trim()) return;
-
     const currentTime = new Date().toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
     });
 
-    setMessages([
-      ...messages,
-      {
-        sender: "You",
-        text: newMsg,
-        time: currentTime,
-      },
-    ]);
+    socket.emit("sendMessage", { message: newMsg });
+
+    // setMessages([
+    //   ...messages,
+    //   {
+    //     sender: "You",
+    //     text: newMsg,
+    //     time: currentTime,
+    //   },
+    // ]);
     setNewMsg("");
   };
 
@@ -147,63 +139,6 @@ socket.on("userJoined", ({userName}) => {
           <h1 className="text-2xl font-bold mb-1">Chat App</h1>
           <p className="text-blue-100 text-sm">Connected and ready to chat</p>
         </div>
-
-        {/* Online Users */}
-        {/* <div className="p-4 border-b border-gray-200">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold text-gray-700">Online Users</h2>
-            <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-              {usersOnline.filter(user => user.status === 'online').length} online
-            </span>
-          </div>
-          
-          <div className="space-y-2 max-h-96 overflow-y-auto">
-            {usersOnline.map((user, index) => (
-              <div
-                key={index}
-                className={`flex items-center p-3 rounded-xl cursor-pointer transition-all duration-200 ${
-                  user.isActive 
-                    ? 'bg-blue-50 border border-blue-200' 
-                    : 'hover:bg-gray-50'
-                }`}
-              >
-                <div className="relative">
-                  <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
-                    {user.name.charAt(0)}
-                  </div>
-                  <div className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${getStatusColor(user.status)}`}></div>
-                </div>
-                <div className="ml-3 flex-1">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium text-gray-800">{user.name}</span>
-                    {user.isActive && (
-                      <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Active</span>
-                    )}
-                  </div>
-                  <span className="text-xs text-gray-500 capitalize">{user.status}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div> */}
-
-        {/* Recent Chats */}
-        {/* <div className="flex-1 p-4">
-          <h3 className="text-lg font-semibold text-gray-700 mb-3">Recent Chats</h3>
-          <div className="space-y-2">
-            {usersOnline.slice(0, 3).map((user, index) => (
-              <div key={index} className="flex items-center p-3 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors">
-                <div className="w-12 h-12 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full flex items-center justify-center text-white font-semibold">
-                  {user.name.charAt(0)}
-                </div>
-                <div className="ml-3">
-                  <p className="font-medium text-gray-800">{user.name}</p>
-                  <p className="text-sm text-gray-500 truncate w-40">Last message preview...</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div> */}
       </div>
       <div className="w-[400px] h-screen bg-blue-300">
         <div className="flex flex-col">
