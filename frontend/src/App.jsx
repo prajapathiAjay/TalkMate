@@ -13,7 +13,7 @@ function App() {
 
     return () => socket.disconnect(); // optional cleanup
   }, []);
-//  socket.connect();
+
   return (
    <Chat/>
   )
