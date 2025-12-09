@@ -4,6 +4,7 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import Chat from "./pages/Chat.jsx"
 import socket from './Socket.jsx'
+import Login from './pages/Login.jsx'
 function App() {
   const [count, setCount] = useState(0)
 
@@ -15,6 +16,7 @@ function App() {
   }, []);
 
   return (
+    // <Login/>
    <Chat/>
   )
 }

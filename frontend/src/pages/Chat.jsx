@@ -13,22 +13,22 @@ const Chat = () => {
   });
   const [currentUser, setCurrentUser] = useState("");
   const [messages, setMessages] = useState([
-    {
-      sender: "Alice",
-      text: "Hey there! How are you doing today? 😊",
-      time: "10:30 AM",
-    },
-    {
-      sender: "You",
-      text: "Hi Alice! I'm doing great, thanks for asking. How about you? 👋",
-      time: "10:31 AM",
-    },
-    { sender: "Bob", text: "Hey everyone! What's up?", time: "10:32 AM" },
-    {
-      sender: "Alice",
-      text: "Just working on some React projects. This chat UI looks amazing! 💻",
-      time: "10:33 AM",
-    },
+    // {
+    //   sender: "Alice",
+    //   text: "Hey there! How are you doing today? 😊",
+    //   time: "10:30 AM",
+    // },
+    // {
+    //   sender: "You",
+    //   text: "Hi Alice! I'm doing great, thanks for asking. How about you? 👋",
+    //   time: "10:31 AM",
+    // },
+    // { sender: "Bob", text: "Hey everyone! What's up?", time: "10:32 AM" },
+    // {
+    //   sender: "Alice",
+    //   text: "Just working on some React projects. This chat UI looks amazing! 💻",
+    //   time: "10:33 AM",
+    // },
   ]);
 
   const handleUserJoined=({ userName }) => {
@@ -110,15 +110,6 @@ const Chat = () => {
     });
 
     socket.emit("sendMessage", { message: newMsg });
-
-    // setMessages([
-    //   ...messages,
-    //   {
-    //     sender: "You",
-    //     text: newMsg,
-    //     time: currentTime,
-    //   },
-    // ]);
     setNewMsg("");
   };
 
