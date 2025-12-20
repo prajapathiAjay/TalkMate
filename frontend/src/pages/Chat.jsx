@@ -95,7 +95,7 @@ const Chat = () => {
   };
 
   return (
-    <div className="flex h-screen w-screen bg-gradient-to-br from-gray-50 to-blue-50">
+    <div className="flex h-screen w-screen bg-linear-to-br from-gray-50 to-blue-50">
       {/* Left Sidebar - User List */}
       <UserList usersOnline={usersOnline} />
 
@@ -107,7 +107,7 @@ const Chat = () => {
         <ChatHeader />
         
         {/* Messages Container */}
-        <div className="flex-1 overflow-y-auto bg-gradient-to-b from-white to-gray-50 p-6">
+        <div className="flex-1 overflow-y-auto bg-linear-to-b from-white to-gray-50 p-6">
           <div className="max-w-4xl mx-auto">
             {messages.length === 0 ? (
               <div className="h-full flex items-center justify-center">
