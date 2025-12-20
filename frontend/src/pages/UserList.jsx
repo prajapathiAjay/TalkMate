@@ -17,7 +17,7 @@ const UserList = ({ usersOnline }) => {
   return (
     <div className="w-80 bg-white shadow-xl rounded-r-2xl flex flex-col border-r border-gray-200">
       {/* Header */}
-      <div className="p-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-tr-2xl">
+      <div className="p-6 bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-tr-2xl">
         <h1 className="text-2xl font-bold mb-1">Chat App</h1>
         <p className="text-blue-100 text-sm">Connected and ready to chat</p>
       </div>
@@ -33,12 +33,12 @@ const UserList = ({ usersOnline }) => {
               key={index}
               className={`flex items-center p-3 rounded-xl transition-all ${
                 user.isActive
-                  ? "bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200"
+                  ? "bg-linear-to-r from-blue-50 to-purple-50 border border-blue-200"
                   : "hover:bg-gray-50"
               }`}
             >
               <div className="relative">
-                <div className="w-10 h-10 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white font-bold">
+                <div className="w-10 h-10 bg-linear-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white font-bold">
                   {user.name.charAt(0)}
                 </div>
                 <div

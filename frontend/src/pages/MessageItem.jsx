@@ -7,7 +7,7 @@ const MessageItem = ({ msg, currentUser }) => {
   if (isJoinMessage) {
     return (
       <div className="flex justify-center my-2">
-        <div className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 px-4 py-2 rounded-full text-sm font-medium border border-blue-200">
+        <div className="bg-linear-to-r from-blue-100 to-purple-100 text-blue-700 px-4 py-2 rounded-full text-sm font-medium border border-blue-200">
           {msg.text}
         </div>
       </div>
@@ -20,7 +20,7 @@ const MessageItem = ({ msg, currentUser }) => {
     >
       <div className="flex max-w-xl">
         {!isCurrentUser && (
-          <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white text-sm font-bold mr-3 mt-1">
+          <div className="w-10 h-10 bg-linear-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white text-sm font-bold mr-3 mt-1">
             {msg.sender?.charAt(0) || "U"}
           </div>
         )}
@@ -39,7 +39,7 @@ const MessageItem = ({ msg, currentUser }) => {
           <div
             className={`px-4 py-3 rounded-2xl shadow-sm ${
               isCurrentUser
-                ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-br-none"
+                ? "bg-linear-to-r from-blue-500 to-purple-600 text-white rounded-br-none"
                 : "bg-white text-gray-800 rounded-bl-none border border-gray-100"
             }`}
           >
