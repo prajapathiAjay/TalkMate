@@ -2,7 +2,7 @@ import mongoose from "mongoose"
 
 
 
-export const userSchema=new mongoose.Schema({
+ const userSchema=new mongoose.Schema({
 name:{
     type:String,
     required:[true,"Name is Required"],
@@ -21,4 +21,4 @@ password:{
 
 
 })
-const UserModel=new mongoose.Model()
+export const UserModel=mongoose.model("User",userSchema)
