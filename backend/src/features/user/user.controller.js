@@ -43,31 +43,7 @@ export const userRegisteration = async (req, res, next) => {
 };
 
 
-// export const userSignIn = async (req, res, next) => {
 
-//   try {
-
-//     const response = await userSignInRepo(req.body)
-//     if (response.success) {
-//       const token = jwt.sign({ id: response.data.id, data: response.data }, process.env.JWT_SECRET, { expiresIn: '1h' })
-//       res.cookie("jwtToken", token, { maxAge: 3600000, httpOnly: true }).json({
-//         success: true,
-//         message: response.message,
-//         status: response.status,
-//       })
-//     }
-
-
-//   } catch (error) {
-//     return next(new customErrorHandler(error.statusCode || 500, error.message || "Internal Server Error"))
-
-//   }
-
-
-
-
-
-// }
 
 export const userSignIn = async (req, res, next) => {
   try {
