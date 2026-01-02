@@ -1,7 +1,8 @@
 import bcrypt from "bcrypt"
 import { userRegisterationRepo } from "./user.reposotory.js"
 import { customErrorHandler } from "../../middlewares/errorHandler.js"
-
+import { userSignInRepo } from "./user.reposotory.js"
+import jwt from "jsonwebtoken"
 
 export const userRegisteration = async (req, res, next) => {
   try {
@@ -40,3 +41,72 @@ export const userRegisteration = async (req, res, next) => {
     );
   }
 };
+
+
+// export const userSignIn = async (req, res, next) => {
+
+//   try {
+
+//     const response = await userSignInRepo(req.body)
+//     if (response.success) {
+//       const token = jwt.sign({ id: response.data.id, data: response.data }, process.env.JWT_SECRET, { expiresIn: '1h' })
+//       res.cookie("jwtToken", token, { maxAge: 3600000, httpOnly: true }).json({
+//         success: true,
+//         message: response.message,
+//         status: response.status,
+//       })
+//     }
+
+
+//   } catch (error) {
+//     return next(new customErrorHandler(error.statusCode || 500, error.message || "Internal Server Error"))
+
+//   }
+
+
+
+
+
+// }
+
+export const userSignIn = async (req, res, next) => {
+  try {
+    const response = await userSignInRepo(req.body)
+
+    if (response.success) {
+      const token = jwt.sign(
+        { id: response.data._id },
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" }
+      )
+
+      return res
+        .cookie("jwtToken", token, {
+          maxAge: 3600000,
+          httpOnly: true,
+        })
+        .status(200)
+        .json({
+          success: true,
+          message: response.message,
+        })
+    }
+
+    // ✅ Proper error forwarding
+    return next(
+      new customErrorHandler(
+        response.error.statusCode,
+        response.error.message
+      )
+    )
+
+  } catch (error) {
+    return next(
+      new customErrorHandler(
+        500,
+        error.message || "Internal Server Error"
+      )
+    )
+  }
+}
+
