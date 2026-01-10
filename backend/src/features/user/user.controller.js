@@ -22,6 +22,7 @@ export const userRegisteration = async (req, res, next) => {
         data: resp.data,
       });
     }
+    
 
     // business logic error (handled response)
     return next(
@@ -31,6 +32,7 @@ export const userRegisteration = async (req, res, next) => {
       )
     );
 
+    
   } catch (error) {
     // unexpected / runtime errors
     return next(
