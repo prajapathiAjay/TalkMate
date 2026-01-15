@@ -38,7 +38,7 @@ export const userSignInRepo = async (data) => {
             return {
                 success: false,
                 error: {
-                    statusCode: 404,
+                    statusCode: 401,
                     msg: "User Not Found"
 
                 }

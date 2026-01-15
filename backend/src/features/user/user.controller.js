@@ -74,7 +74,7 @@ export const userSignIn = async (req, res, next) => {
     return next(
       new customErrorHandler(
         response.error.statusCode,
-        response.error.message
+        response.error.msg
       )
     )
 
