@@ -2,11 +2,15 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import {useNavigate} from 'react-router-dom'
-
+import { useNavigate } from "react-router-dom";
+import CustomApiServices from "../services/CustomApiService";
+import { useState } from "react";
 // Validation schema
 const schema = yup.object().shape({
-  email: yup.string().email("Invalid email address").required("Email is required"),
+  email: yup
+    .string()
+    .email("Invalid email address")
+    .required("Email is required"),
   password: yup
     .string()
     .min(6, "Password must be at least 6 characters")
@@ -14,8 +18,9 @@ const schema = yup.object().shape({
 });
 
 const Login = () => {
-const navigate=useNavigate();
-
+  const { GET, POST } = CustomApiServices();
+  const navigate = useNavigate();
+  const [type, setType] = useState("login");
 
   const {
     register,
@@ -26,8 +31,14 @@ const navigate=useNavigate();
   });
 
   const onSubmit = (data) => {
-    navigate('/chat');
+    // navigate("/chat");
     console.log("Form Data:", data);
+    try {
+      const response = POST("user/signIn", {}, {}, data);
+      console.log("Response:", response);
+    } catch (error) {
+      console.log("Error:", error);
+    }
   };
 
   return (
@@ -37,6 +48,18 @@ const navigate=useNavigate();
 
         <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
           {/* Email */}
+          {/* <div className="mb-4">
+            <label className="block mb-1 font-medium">Name</label>
+            <input
+              type="text"
+              {...register("name")}
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring"
+              placeholder="Enter your Name"
+            />
+            {errors.email && (
+              <p className="text-red-600 text-sm mt-1">{errors.name.message}</p>
+            )}
+          </div> */}
           <div className="mb-4">
             <label className="block mb-1 font-medium">Email</label>
             <input
@@ -46,7 +69,9 @@ const navigate=useNavigate();
               placeholder="Enter your email"
             />
             {errors.email && (
-              <p className="text-red-600 text-sm mt-1">{errors.email.message}</p>
+              <p className="text-red-600 text-sm mt-1">
+                {errors.email.message}
+              </p>
             )}
           </div>
 
@@ -60,7 +85,9 @@ const navigate=useNavigate();
               placeholder="Enter your password"
             />
             {errors.password && (
-              <p className="text-red-600 text-sm mt-1">{errors.password.message}</p>
+              <p className="text-red-600 text-sm mt-1">
+                {errors.password.message}
+              </p>
             )}
           </div>
 
