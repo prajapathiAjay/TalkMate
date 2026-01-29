@@ -67,6 +67,7 @@ export const userSignIn = async (req, res, next) => {
         .json({
           success: true,
           message: response.message,
+          data:response.data
         })
     }
 

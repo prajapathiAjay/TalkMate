@@ -11,7 +11,13 @@ export const userRegisterationRepo = async (userData) => {
             success: true,
             status: 201,
             message: "User Registered Successfully",
-            data: newUser
+            data: {
+                user: {
+                    userId: newUser._id,
+                    name: newUser.name,
+                    email: newUser.email,
+                }
+            }
         }
     } catch (error) {
         return {
@@ -59,7 +65,13 @@ export const userSignInRepo = async (data) => {
                     success: true,
                     status: 200,
                     message: "Signin Successful",
-                    data: user
+                    data: {
+                        user: {
+                            userId: user._id,
+                            name: user.name,
+                            email: user.email
+                        }
+                    }
                 }
             }
 
