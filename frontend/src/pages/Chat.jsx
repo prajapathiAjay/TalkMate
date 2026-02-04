@@ -7,12 +7,12 @@ import MessageItem from "./MessageItem";
 import MessageInput from "./MessageInput";
 
 const Chat = () => {
-  const [currentUser, setCurrentUser] = useState("");
+  const [currentUser, setCurrentUser] = useState("Ajay");
   const [messages, setMessages] = useState([]);
   const [newMsg, setNewMsg] = useState("");
   const [roomType,setRoomType]=useState("public")
   const messagesEndRef = useRef(null);
-
+  
 
   const usersOnline = [
     { name: "Alice", status: "online", isActive: true },
@@ -149,7 +149,7 @@ const Chat = () => {
           setNewMsg={setNewMsg}
           onSend={sendMessage}
           onKeyPress={handleKeyPress}
-          // disabled={!currentUser}
+          disabled={!currentUser}
         />
       </div>
     </div>
