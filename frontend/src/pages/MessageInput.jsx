@@ -1,6 +1,7 @@
 import React from "react";
 
 const MessageInput = ({ newMsg, setNewMsg, onSend, onKeyPress, disabled = false }) => {
+
   return (
     <div className="bg-white border-t border-gray-200 p-4">
       <div className="max-w-6xl mx-auto">
@@ -46,7 +47,7 @@ const MessageInput = ({ newMsg, setNewMsg, onSend, onKeyPress, disabled = false 
             disabled={!newMsg.trim() || disabled}
             className={`px-6 py-3 rounded-2xl font-medium transition-all duration-200 ${
               newMsg.trim() && !disabled
-                ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                ? "bg-linear-to-r from-blue-500 to-purple-500 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
             }`}
           >

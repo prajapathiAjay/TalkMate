@@ -1,26 +1,21 @@
-import { useState,useEffect } from 'react'
+import { useState, useEffect } from "react";
+import "./App.css";
+import socket from "./Socket.jsx";
+import RoutingSetup from "./components/RoutingSetup.jsx";
+import { useAuth } from "./contexts/AuthProvider.jsx";
 
-import viteLogo from '/vite.svg'
-import './App.css'
-import Chat from "./pages/Chat.jsx"
-import socket from './Socket.jsx'
-import Login from './pages/Login.jsx'
-import RoutingSetup from './components/RoutingSetup.jsx'
 function App() {
-  const [count, setCount] = useState(0)
+  const { userData } = useAuth();
 
-
-    useEffect(() => {
-    socket.connect(); // 🔥 connect ONCE when App mounts
-   console.log("ApiUrl",import.meta.env.VITE_API_URL);
+  useEffect(() => {
+    if(!userData) return
+    socket.connect(); 
     return () => socket.disconnect(); // optional cleanup
-  }, []);
+  }, [userData]);
 
   return (
-    // <Login/>
-  //  <Chat/>
-  <RoutingSetup/>
-  )
+    <RoutingSetup />
+  );
 }
 
-export default App
+export default App;

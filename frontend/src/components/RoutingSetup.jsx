@@ -8,7 +8,7 @@ const RoutingSetup = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Login />} />
-               <Route path="/chat" element={<Chat/>} />
+        <Route path="/chat" element={<Chat/>} />
       </Routes>
     </BrowserRouter>
   );

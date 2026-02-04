@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthProvider";
 import Cookies from "js-cookie";
 import { 
   Mail, 
@@ -29,13 +30,14 @@ import {
 import CustomApiServices from "../services/CustomApiService";
 
 const Login = () => {
+  const {login}=useAuth();
   const { POST } = CustomApiServices();
   const navigate = useNavigate();
   const [type, setType] = useState("login");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
+  
   const schema = useMemo(() => {
     const baseSchema = {
       email: yup
@@ -99,6 +101,7 @@ const Login = () => {
 
       const response = await POST(endpoint, {}, {}, payload);
   if(response.success){
+    login(response.data);
     navigate("/chat")
   }
      
@@ -119,13 +122,13 @@ const Login = () => {
   };
 
   return (
-    <div className="h-screen w-screen overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-blue-900">
+    <div className="h-screen w-screen overflow-hidden bg-linear-to-br from-slate-900 via-slate-800 to-blue-900">
       <div className="h-full w-full flex flex-col lg:flex-row">
         {/* Left Panel - Full Height Content */}
         <div className="lg:w-1/2 h-full p-6 lg:p-8 xl:p-12 flex flex-col overflow-hidden">
           {/* Logo */}
           <div className="flex items-center space-x-4 mb-8 lg:mb-12">
-            <div className="p-3 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl shadow-lg">
+            <div className="p-3 bg-linear-to-br from-blue-500 to-cyan-400 rounded-xl shadow-lg">
               <MessageSquare size={28} className="text-white" />
             </div>
             <div>
@@ -144,7 +147,7 @@ const Login = () => {
               
               <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6 leading-tight">
                 Professional<br />
-                <span className="bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
+                <span className="bg-linear-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
                   Team Collaboration
                 </span>
               </h2>
@@ -158,7 +161,7 @@ const Login = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 flex-1 overflow-hidden">
               <div className="p-4 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10">
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg">
+                  <div className="p-2 bg-linear-to-br from-blue-500 to-blue-600 rounded-lg">
                     <Shield className="w-5 h-5 text-white" />
                   </div>
                   <div>
@@ -170,7 +173,7 @@ const Login = () => {
 
               <div className="p-4 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10">
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-lg">
+                  <div className="p-2 bg-linear-to-br from-emerald-500 to-teal-500 rounded-lg">
                     <LineChart className="w-5 h-5 text-white" />
                   </div>
                   <div>
@@ -182,7 +185,7 @@ const Login = () => {
 
               <div className="p-4 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10">
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-lg">
+                  <div className="p-2 bg-linear-to-br from-purple-500 to-indigo-500 rounded-lg">
                     <Building2 className="w-5 h-5 text-white" />
                   </div>
                   <div>
@@ -194,7 +197,7 @@ const Login = () => {
 
               <div className="p-4 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10">
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-gradient-to-br from-amber-500 to-orange-500 rounded-lg">
+                  <div className="p-2 bg-linear-to-br from-amber-500 to-orange-500 rounded-lg">
                     <Award className="w-5 h-5 text-white" />
                   </div>
                   <div>
@@ -206,10 +209,10 @@ const Login = () => {
             </div>
 
             {/* Testimonial - Fixed at bottom */}
-            <div className="mt-6 p-5 bg-gradient-to-r from-blue-900/30 to-indigo-900/30 rounded-xl border border-blue-500/20">
+            <div className="mt-6 p-5 bg-linear-to-r from-blue-900/30 to-indigo-900/30 rounded-xl border border-blue-500/20">
               <div className="flex items-start space-x-3">
-                <div className="flex-shrink-0">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
+                <div className="shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-linear-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
                     <Users className="w-5 h-5 text-white" />
                   </div>
                 </div>
@@ -232,7 +235,7 @@ const Login = () => {
           <div className="w-full max-w-md h-full flex flex-col justify-center py-8">
             {/* Mobile Header */}
             <div className="lg:hidden flex items-center justify-center space-x-3 mb-8">
-              <div className="p-3 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl shadow">
+              <div className="p-3 bg-linear-to-br from-blue-500 to-cyan-400 rounded-xl shadow">
                 <MessageSquare size={28} className="text-white" />
               </div>
               <div className="text-center">
@@ -444,7 +447,7 @@ const Login = () => {
                   className={`w-full py-3 text-sm font-semibold rounded-lg transition-all ${
                     loading
                       ? "bg-slate-400 cursor-not-allowed"
-                      : "bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white shadow hover:shadow-md active:scale-[0.98]"
+                      : "bg-linear-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white shadow hover:shadow-md active:scale-[0.98]"
                   }`}
                 >
                   {loading ? (
