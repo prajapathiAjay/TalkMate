@@ -10,7 +10,9 @@ const Chat = () => {
   const [currentUser, setCurrentUser] = useState("");
   const [messages, setMessages] = useState([]);
   const [newMsg, setNewMsg] = useState("");
+  const [roomType,setRoomType]=useState("public")
   const messagesEndRef = useRef(null);
+
 
   const usersOnline = [
     { name: "Alice", status: "online", isActive: true },
@@ -90,18 +92,31 @@ const Chat = () => {
     }
   };
 
-  const handleUserJoin = (data) => {
-    socket.emit("join", { userName: data.name, roomId: data.roomId });
+  const handleCreateRoom = (data) => {
+    console.log("Joining with data:", data);
+    
+   const payload={
+    roomName: data.roomName,
+    type:"group",
+    // createdBy:
+
+
+
+   }
+
+
+    socket.emit("createRoom", { roomName: data.roomName });
   };
+  
 
   return (
     <div className="flex h-screen w-screen bg-linear-to-br from-gray-50 to-blue-50">
       {/* Left Sidebar - User List */}
-      <UserList usersOnline={usersOnline} />
+      {/* <UserList usersOnline={usersOnline} /> */}
 
       {/* Middle - Join Room / Welcome */}
-      <JoinRoom onJoin={handleUserJoin} currentUser={currentUser} />
-
+      <JoinRoom onJoin={handleCreateRoom} currentUser={currentUser} />
+      
       {/* Right - Main Chat Area */}
       <div className={`flex-1 flex flex-col ${!currentUser ? "opacity-50 pointer-events-none" : ""}`}>
         <ChatHeader />
@@ -134,7 +149,7 @@ const Chat = () => {
           setNewMsg={setNewMsg}
           onSend={sendMessage}
           onKeyPress={handleKeyPress}
-          disabled={!currentUser}
+          // disabled={!currentUser}
         />
       </div>
     </div>
