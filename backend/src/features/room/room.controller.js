@@ -1,13 +1,22 @@
 
 
 
-import { customErrorHandler } from "../../middlewares/errorHandler";
+import { customErrorHandler } from "../../middlewares/errorHandler.js";
 import { roomCreationRepo } from "./room.repository.js";
 
 
 
 export const roomCreation = async (req,res,next) => {
-    const roomData = req.body;
+    const {roomName,type,} = req.body;
+    const roomData={
+        roomName:roomName,
+        type:type,
+        createdBy:req.user.id,
+        admins:req.user.id,
+        admins: [req.user.id],
+        participants: [req.user.id],
+
+    }
 
     try {
 
@@ -15,10 +24,10 @@ export const roomCreation = async (req,res,next) => {
 
 
         if (resp.success) {
-            return resp.status(201).json({
+            return res.status(201).json({
                 successs: true,
-                message: resp.message,
-                data: resp.data
+                message: resp?.message,
+                // data: resp.data
             })
 
         }

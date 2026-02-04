@@ -14,7 +14,6 @@ const roomSchema = new mongoose.Schema({
         type: String,
         enum: ["public", "private", "group"],
         required: true
-
     },
     createdBy: {
 

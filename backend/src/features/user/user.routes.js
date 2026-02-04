@@ -6,12 +6,14 @@ import { userRegisteration,userSignIn } from "./user.controller.js"
 
 
 
-const router=express.Router()
-router.route("/signUp").post(userRegisteration)
-router.route("/signIn").post(userSignIn)
+const userRouter=express.Router()
 
-export default router
-
+userRouter.route("/signUp").post(userRegisteration)
+userRouter.route("/signIn").post(userSignIn)
 
 
 
+
+
+
+export default userRouter

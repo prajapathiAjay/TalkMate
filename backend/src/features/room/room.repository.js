@@ -10,13 +10,24 @@ try {
 return{
     success:true,
     status:201,
-    message:`New room with name:${newRoom.roomName} has been created uccessfully`,
+    message:`New room with name:${newRoom?.roomName} has been created uccessfully`,
    
 
 
 }
 
 } catch (error) {
+// if (error.code === 11000) {
+//       return {
+//         success: false,
+//         error: {
+//           statusCode: 409, // Conflict
+//           message: "Room name already exists"
+//         }
+//       };
+//     }
+
+
     return{
         success:false,
         error:{
