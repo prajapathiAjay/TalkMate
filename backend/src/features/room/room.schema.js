@@ -5,12 +5,22 @@ const roomSchema = new mongoose.Schema({
         type: String,
         // required: true,
         // unique: true,
-        index: true
+        index: true,
+        required: true,
+        unique:true
 
     },
-    isGroup: {
-        type:Boolean,
-        default: true
+    type: {
+        type: String,
+        enum: ["public", "private", "group"],
+        required: true
+
+    },
+    createdBy: {
+
+        type: mongoose.Schema.Types.ObjectId, ref: "User",
+        default: null
+
     },
     participants: [
         {
@@ -18,14 +28,13 @@ const roomSchema = new mongoose.Schema({
             ref: "User"
         },
     ],
-    
 
-    admin: [{
+    admins: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
     }]
 
-},{timestamps:true}
+}, { timestamps: true }
 
 )
 
@@ -33,4 +42,4 @@ roomSchema.index({ participants: 1 });
 roomSchema.index({ updatedAt: -1 });
 
 
-export const RoomModel=mongoose.model("Room",roomSchema)
+export const RoomModel = mongoose.model("Room", roomSchema)

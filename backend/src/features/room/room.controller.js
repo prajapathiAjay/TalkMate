@@ -6,8 +6,8 @@ import { roomCreationRepo } from "./room.repository.js";
 
 
 
-export const roomCreation = async (roomData) => {
-
+export const roomCreation = async (req,res,next) => {
+    const roomData = req.body;
 
     try {
 

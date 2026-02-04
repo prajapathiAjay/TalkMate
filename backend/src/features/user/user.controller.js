@@ -53,7 +53,7 @@ export const userSignIn = async (req, res, next) => {
 
     if (response.success) {
       const token = jwt.sign(
-        { id: response.data._id },
+        { id: response.data.user.userId },
         process.env.JWT_SECRET,
         { expiresIn: "1h" }
       )

@@ -2,7 +2,7 @@ import express from "express"
 import cors from "cors"
 import userRouter from "./src/features/user/user.routes.js"
 import { appLevelErrorHandlerMiddleware } from "./src/middlewares/errorHandler.js"
-
+import cookieParser from "cookie-parser"
 const app = express()
 
 app.use(
@@ -16,7 +16,7 @@ app.use(
 
 // 👇 VERY IMPORTANT (handles preflight requests)
 // app.options("*", cors())
-
+app.use(cookieParser())
 app.use(express.json())
 
 app.use("/api/user", userRouter)
