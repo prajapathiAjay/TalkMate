@@ -5,14 +5,19 @@ import JoinRoom from "./JoinRoom";
 import ChatHeader from "./ChatHeader";
 import MessageItem from "./MessageItem";
 import MessageInput from "./MessageInput";
+import { useAuth } from "../contexts/AuthProvider.jsx";
 
 const Chat = () => {
-  const [currentUser, setCurrentUser] = useState("Ajay");
+  const { userData } = useAuth();
+  let userId = userData?.user?.userId;
+  let publicRoomId = userData?.user?.publicRoomId;
+  console.log("User Data in Chat Component:", userData);
+  const [currentUser, setCurrentUser] = useState(userData?.user?.userId);
   const [messages, setMessages] = useState([]);
   const [newMsg, setNewMsg] = useState("");
-  const [roomType,setRoomType]=useState("public")
+  const [roomType, setRoomType] = useState("public");
   const messagesEndRef = useRef(null);
-  
+  console.log("sendt message", newMsg);
 
   const usersOnline = [
     { name: "Alice", status: "online", isActive: true },
@@ -41,21 +46,31 @@ const Chat = () => {
     setCurrentUser(userName);
   };
 
-  const handleMessage = ({ userName, message }) => {
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      {
-        sender: userName,
-        text: message,
-        time: new Date().toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-      },
-    ]);
+  const handleMessage = (message) => {
+    // setMessages((prevMessages) => [
+    //   ...prevMessages,
+    //   {
+    //     sender: userName,
+    //     text: message,
+    //     time: new Date().toLocaleTimeString([], {
+    //       hour: "2-digit",
+    //       minute: "2-digit",
+    //     }),
+    //   },
+    // ]);
+
+    if (message?.success) {
+      console.log("Received message from server:", message.data);
+      setMessages((prevMessages) => [...prevMessages, message.data]);
+    }
   };
 
+  console.log("Messagest", messages);
+  
   useEffect(() => {
+    if (!currentUser) return;
+
+    socket.emit("join", { publicRoomId: publicRoomId, userName: currentUser });
     socket.on("userJoined", handleUserJoined);
     socket.on("joinSuccess", handleJoinSuccess);
     socket.on("message", handleMessage);
@@ -68,7 +83,7 @@ const Chat = () => {
       socket.off("joinSuccess", handleJoinSuccess);
       socket.off("message", handleMessage);
     };
-  }, []);
+  }, [currentUser, publicRoomId]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -80,8 +95,19 @@ const Chat = () => {
 
   const sendMessage = () => {
     if (!newMsg.trim()) return;
-    
-    socket.emit("sendMessage", { message: newMsg });
+    const messageData = {
+      senderId: userId,
+      senderName: userData?.user?.name,
+      message: newMsg,
+    };
+    if (roomType === "public") {
+      messageData.roomId = publicRoomId;
+    }
+
+    socket.emit("sendMessage", messageData, (res) => {
+      console.log("Server response to sendMessage:", res);
+    });
+    console.log("Message sent:", newMsg);
     setNewMsg("");
   };
 
@@ -94,20 +120,15 @@ const Chat = () => {
 
   const handleCreateRoom = (data) => {
     console.log("Joining with data:", data);
-    
-   const payload={
-    roomName: data.roomName,
-    type:"group",
-    // createdBy:
 
-
-
-   }
-
+    const payload = {
+      roomName: data.roomName,
+      type: "group",
+      // createdBy:
+    };
 
     socket.emit("createRoom", { roomName: data.roomName });
   };
-  
 
   return (
     <div className="flex h-screen w-screen bg-linear-to-br from-gray-50 to-blue-50">
@@ -116,22 +137,36 @@ const Chat = () => {
 
       {/* Middle - Join Room / Welcome */}
       <JoinRoom onJoin={handleCreateRoom} currentUser={currentUser} />
-      
+
       {/* Right - Main Chat Area */}
-      <div className={`flex-1 flex flex-col ${!currentUser ? "opacity-50 pointer-events-none" : ""}`}>
+      <div
+        className={`flex-1 flex flex-col ${!currentUser ? "opacity-50 pointer-events-none" : ""}`}
+      >
         <ChatHeader />
-        
+
         {/* Messages Container */}
         <div className="flex-1 overflow-y-auto bg-linear-to-b from-white to-gray-50 p-6">
           <div className="max-w-4xl mx-auto">
             {messages.length === 0 ? (
               <div className="h-full flex items-center justify-center">
                 <div className="text-center text-gray-400">
-                  <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  <svg
+                    className="w-16 h-16 mx-auto mb-4 text-gray-300"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                    />
                   </svg>
                   <p className="text-lg font-medium">No messages yet</p>
-                  <p className="text-sm">Start a conversation by sending a message!</p>
+                  <p className="text-sm">
+                    Start a conversation by sending a message!
+                  </p>
                 </div>
               </div>
             ) : (

@@ -1,7 +1,7 @@
 import React from "react";
 
 const MessageItem = ({ msg, currentUser }) => {
-  const isCurrentUser = msg.sender === currentUser;
+  const isCurrentUser = msg.senderId !== currentUser;
   const isJoinMessage = msg.type === "joining message";
 
   if (isJoinMessage) {
@@ -32,7 +32,7 @@ const MessageItem = ({ msg, currentUser }) => {
         >
           {!isCurrentUser && (
             <p className="font-semibold text-gray-700 text-sm mb-1 ml-1">
-              {msg.sender}
+              {msg?.senderName}
             </p>
           )}
           
@@ -43,11 +43,11 @@ const MessageItem = ({ msg, currentUser }) => {
                 : "bg-white text-gray-800 rounded-bl-none border border-gray-100"
             }`}
           >
-            <p className="text-sm">{msg.text}</p>
+            <p className="text-sm">{msg?.message}</p>
           </div>
           
           <span className="text-xs text-gray-500 mt-1 px-1">
-            {msg.time}
+            {msg?.createdAt}
           </span>
         </div>
       </div>
