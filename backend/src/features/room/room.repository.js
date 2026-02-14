@@ -17,16 +17,15 @@ return{
 }
 
 } catch (error) {
-// if (error.code === 11000) {
-//       return {
-//         success: false,
-//         error: {
-//           statusCode: 409, // Conflict
-//           message: "Room name already exists"
-//         }
-//       };
-//     }
-
+if (error.code === 11000) {
+      return {
+        success: false,
+        error: {
+          statusCode: 409, // Conflict
+          message: "Room name already exists"
+        }
+      };
+    }
 
     return{
         success:false,

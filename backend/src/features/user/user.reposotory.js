@@ -1,11 +1,19 @@
 
+
 import { UserModel } from "./user.schema.js"
+import {RoomModel} from "../room/room.schema.js"
 import bcrypt from "bcrypt"
 export const userRegisterationRepo = async (userData) => {
 
 
     try {
         const newUser = new UserModel(userData)
+        const publicRoomData=await RoomModel.findOne({type:"Public"})
+        
+        if(publicRoomData){
+            // publicRoomData.participants.push(newUser._id)
+            // await publicRoomData.save()
+        }
         await newUser.save()
         return {
             success: true,
@@ -13,9 +21,10 @@ export const userRegisterationRepo = async (userData) => {
             message: "User Registered Successfully",
             data: {
                 user: {
+                    publicRommId: publicRoomData._id,
                     userId: newUser._id,
                     name: newUser.name,
-                    email: newUser.email,
+                    // email: newUser.email,
                 }
             }
         }
@@ -40,6 +49,8 @@ export const userSignInRepo = async (data) => {
 
     try {
         const user = await UserModel.findOne({ email })
+         const publicRoomData=await RoomModel.findOne({type:"public"})
+         console.log("public room data at signin repo",publicRoomData)
         if (!user) {
             return {
                 success: false,
@@ -67,9 +78,10 @@ export const userSignInRepo = async (data) => {
                     message: "Signin Successful",
                     data: {
                         user: {
+                            publicRoomId: publicRoomData._id,
                             userId: user._id,
                             name: user.name,
-                            email: user.email
+                            // email: user.email
                         }
                     }
                 }

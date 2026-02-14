@@ -1,38 +1,55 @@
 import { Server } from "socket.io";
-
+import { socketAuth } from "../middlewares/socketAuth.js";
+// message services
+import { createMessage } from "../features/message/message.service.js";
 export const socketLogic = (server) => {
+
   const io = new Server(server, {
     cors: {
       origin: "http://localhost:5173",
       methods: ["GET", "POST"],
+      credentials: true,
     },
   });
-
+  io.use(socketAuth);
   io.on("connection", (socket) => {
-    console.log("Connection made.");
 
+    console.log("Socket connected:", socket.user.id);
     // User joins a room
-    socket.on("join", ({ roomId, userName }) => {
-      socket.roomId = roomId;
+    socket.on("join", ({ publicRoomId, userName }) => {
+      socket.roomId = publicRoomId;
       socket.userName = userName;
 
-      socket.join(roomId);
+      socket.join(publicRoomId);
 
       socket.emit("joinSuccess", { userName });
-      console.log(`${userName} joined room: ${roomId}`);
-
-      socket.to(roomId).emit("userJoined", { userName });
+      socket.to(publicRoomId).emit("userJoined", { userName });
     });
 
-    // User sends a message
-    socket.on("sendMessage", ({ message }) => {
-      const { roomId, userName } = socket;
+    socket.on("sendMessage", async ({ message, senderName }, ack) => {
+      const { roomId, userNam } = socket
+      try {
+        let userId = socket.user.id
+        const messageData = { roomId, senderId: userId, senderName, message }
+        const messageSaved = await createMessage(messageData)
+        io.to(roomId).emit("message", messageSaved)
 
-      io.to(roomId).emit("message", {
-        userName,
-        message,
-      });
-    });
+
+        ack?.({
+          messageSaved
+        })
+        
+
+      } catch (error) {
+
+        ack?.({
+          success: false,
+          message: "Failed to send message",
+          error: error.message
+        })
+      }
+
+    })
 
     socket.on("disconnect", () => {
       console.log("Connection disconnected.");
@@ -41,3 +58,6 @@ export const socketLogic = (server) => {
 
   return io;
 };
+
+
+
