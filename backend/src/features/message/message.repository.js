@@ -15,10 +15,35 @@ export const createMessageRepository = async (messageData) => {
         return {
             success: false, error: {
                 statusCode: 500,
-                message: error
+                message:error
             }
 
         }
     }
 
 }
+
+export const getMessageRepo = async (getmsgPayload) => {
+
+    try {
+        const { type } = getmsgPayload
+        const messages = await MessageModel.find({ type })
+
+        return ({
+            success: true,
+            status: 200,
+            message: "messageFetched Successfully",
+            data: messages
+        })
+    } catch (error) {
+        return ({
+            success: false,
+            status: 500,
+            message: error.message
+        })
+    }
+
+
+
+}
+
