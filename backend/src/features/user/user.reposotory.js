@@ -8,7 +8,7 @@ export const userRegisterationRepo = async (userData) => {
 
     try {
         const newUser = new UserModel(userData)
-        const publicRoomData=await RoomModel.findOne({type:"Public"})
+        const publicRoomData=await RoomModel.findOne({type:"public"})
         
         if(publicRoomData){
             // publicRoomData.participants.push(newUser._id)
@@ -21,9 +21,9 @@ export const userRegisterationRepo = async (userData) => {
             message: "User Registered Successfully",
             data: {
                 user: {
-                    publicRommId: publicRoomData._id,
-                    userId: newUser._id,
-                    name: newUser.name,
+                    publicRommId: publicRoomData?._id ,
+                    userId: newUser?._id,
+                    name: newUser?.name,
                     // email: newUser.email,
                 }
             }

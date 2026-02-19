@@ -4,7 +4,7 @@ import { customErrorHandler } from "../../middlewares/errorHandler.js"
 
 export const getMessage= async (req,res,next)=>{
 
-const {type}=req.body
+const {type}=req?.query
 try{
 
     const messages=await getMessageRepo(type)

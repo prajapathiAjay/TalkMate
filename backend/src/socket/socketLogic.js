@@ -27,7 +27,7 @@ export const socketLogic = (server) => {
     });
 
     socket.on("sendMessage", async ({ message, senderName }, ack) => {
-      const { roomId, userNam } = socket
+      const { roomId, userName } = socket
       try {
         let userId = socket.user.id
         const messageData = { roomId, senderId: userId, senderName, message }
