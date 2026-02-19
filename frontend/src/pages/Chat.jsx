@@ -6,8 +6,10 @@ import ChatHeader from "./ChatHeader";
 import MessageItem from "./MessageItem";
 import MessageInput from "./MessageInput";
 import { useAuth } from "../contexts/AuthProvider.jsx";
+import CustomApiService from "../services/CustomApiService.jsx";
 
 const Chat = () => {
+  const {GET}=CustomApiService()
   const { userData } = useAuth();
   let userId = userData?.user?.userId;
   let publicRoomId = userData?.user?.publicRoomId;
@@ -64,6 +66,30 @@ const Chat = () => {
       setMessages((prevMessages) => [...prevMessages, message.data]);
     }
   };
+const fetchAllMessages=async ()=>{
+try {
+  const response=await GET("messages/getMessages",{type:roomType},{},{},)
+  
+if(response?.success){
+        console.log("response",response)
+        const allMessages=response?.data
+        setMessages([...allMessages])
+}
+
+
+
+
+} catch (error) {
+  console.log("error",error)
+}
+
+
+}
+
+  useEffect(()=>{
+   fetchAllMessages()
+
+  },[])
 
   console.log("Messagest", messages);
   
@@ -95,19 +121,21 @@ const Chat = () => {
 
   const sendMessage = () => {
     if (!newMsg.trim()) return;
+    
     const messageData = {
       senderId: userId,
       senderName: userData?.user?.name,
       message: newMsg,
     };
+    console.log("messageData",messageData)
     if (roomType === "public") {
       messageData.roomId = publicRoomId;
     }
 
     socket.emit("sendMessage", messageData, (res) => {
-      console.log("Server response to sendMessage:", res);
+      console.log("server", res);
     });
-    console.log("Message sent:", newMsg);
+    // console.log("Message sent:", res);
     setNewMsg("");
   };
 

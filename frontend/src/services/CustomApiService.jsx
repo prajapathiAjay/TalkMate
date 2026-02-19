@@ -25,7 +25,7 @@ apiClient.interceptors.response.use(
 // Main service function returning API methods
 const CustomApiService = () => {
   // GET request
-  const GET = async (endpoint, params = {}, headers = {}) => {
+  const GET = async (endpoint, params = {}, headers = {},data) => {
     try {
       const res = await apiClient.get(`/${endpoint}`, { params, headers });
       return { ...res.data, headers: res.headers };
