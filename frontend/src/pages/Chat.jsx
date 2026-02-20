@@ -9,7 +9,7 @@ import { useAuth } from "../contexts/AuthProvider.jsx";
 import CustomApiService from "../services/CustomApiService.jsx";
 
 const Chat = () => {
-  const {GET}=CustomApiService()
+  const { GET } = CustomApiService();
   const { userData } = useAuth();
   let userId = userData?.user?.userId;
   let publicRoomId = userData?.user?.publicRoomId;
@@ -66,36 +66,38 @@ const Chat = () => {
       setMessages((prevMessages) => [...prevMessages, message.data]);
     }
   };
-const fetchAllMessages=async ()=>{
-try {
-  const response=await GET("messages/getMessages",{type:roomType},{},{},)
-  
-if(response?.success){
-        console.log("response",response)
-        const allMessages=response?.data
-        setMessages([...allMessages])
-}
+  const fetchAllMessages = async () => {
+    try {
+      const response = await GET(
+        "messages/getMessages",
+        { type: roomType },
+        {},
+        {},
+      );
 
+      if (response?.success) {
+        console.log("response", response);
+        const allMessages = response?.data;
+        setMessages([...allMessages]);
+      }
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
 
-
-
-} catch (error) {
-  console.log("error",error)
-}
-
-
-}
-
-  useEffect(()=>{
-   fetchAllMessages()
-
-  },[])
+  useEffect(() => {
+    fetchAllMessages();
+  }, []);
 
   console.log("Messagest", messages);
-  
+const handleStatusChange=(data)=>{
+console.log("handleStatus",data)
+}
+
+
   useEffect(() => {
     if (!currentUser) return;
-
+    socket.on("user-status-changed",handleStatusChange);
     socket.emit("join", { publicRoomId: publicRoomId, userName: currentUser });
     socket.on("userJoined", handleUserJoined);
     socket.on("joinSuccess", handleJoinSuccess);
@@ -121,13 +123,13 @@ if(response?.success){
 
   const sendMessage = () => {
     if (!newMsg.trim()) return;
-    
+
     const messageData = {
       senderId: userId,
       senderName: userData?.user?.name,
       message: newMsg,
     };
-    console.log("messageData",messageData)
+    console.log("messageData", messageData);
     if (roomType === "public") {
       messageData.roomId = publicRoomId;
     }
