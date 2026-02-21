@@ -1,6 +1,8 @@
 import { Server } from "socket.io";
 import { socketAuth } from "../middlewares/socketAuth.js";
 // message services
+
+import { handleOnlineUsers } from "../realTime/user.socket.js";
 import { createMessage } from "../features/message/message.service.js";
 export const socketLogic = (server) => {
 
@@ -12,10 +14,18 @@ export const socketLogic = (server) => {
     },
   });
   io.use(socketAuth);
-  io.on("connection", (socket) => {
+  io.on("connection",async (socket) => {
+    console.log("socket connected")
+ try {
+  await handleOnlineUsers(socket)
+ } catch (error) {
+  console.log(error)
+ }
+   
 
-    console.log("Socket connected:", socket.user.id);
-    // User joins a room
+   
+
+
     socket.on("join", ({ publicRoomId, userName }) => {
       socket.roomId = publicRoomId;
       socket.userName = userName;
@@ -38,7 +48,7 @@ export const socketLogic = (server) => {
         ack?.({
           messageSaved
         })
-        
+
 
       } catch (error) {
 
@@ -52,7 +62,7 @@ export const socketLogic = (server) => {
     })
 
     socket.on("disconnect", () => {
-      console.log("Connection disconnected.");
+      console.log("socket disconnected");
     });
   });
 

@@ -16,6 +16,14 @@ email:{
 password:{
     type:String,
     required:[true,"Password is required"]
+},
+isOnline:{
+    type:Boolean,
+    default:false
+},
+lastSeen:{
+    type:Date,
+    default:null
 }
 
 

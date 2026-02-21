@@ -104,3 +104,32 @@ export const userSignInRepo = async (data) => {
         }
     }
 }
+
+
+////////////////////////////////////////////////////////////////
+// ******SOCKET REPO FUNCTIONS______________ 
+////////////////////////////////////////////////////////////////       
+
+export const handleOnlineUsersrepo = async (userId) => {
+    console.log("handleonlinerepotriggered")
+  try {
+    const updatedUser = await UserModel.findByIdAndUpdate(
+      userId,
+      { isOnline: true,lastSeen:new Date },
+      { new: true }   // returns updated document
+    );
+    //  console.log("updatedUser",updatedUser)
+    return {
+      success: true,
+      status: 200,
+      data: updatedUser
+    };
+
+  } catch (error) {
+    return {
+      success: false,
+      status: 500,
+      message: error.message
+    };
+  }
+};
