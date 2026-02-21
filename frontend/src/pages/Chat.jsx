@@ -94,17 +94,21 @@ const handleStatusChange=(data)=>{
 console.log("handleStatus",data)
 }
 
-
   useEffect(() => {
     if (!currentUser) return;
+
     socket.on("user-status-changed",handleStatusChange);
     socket.emit("join", { publicRoomId: publicRoomId, userName: currentUser });
     socket.on("userJoined", handleUserJoined);
     socket.on("joinSuccess", handleJoinSuccess);
     socket.on("message", handleMessage);
+    // socket.on("user-status-changed",handleUserStatus)
     socket.on("connect_error", (error) => {
       console.error("Socket connection error:", error.message);
     });
+    socket.on("disconnect", (reason) => {
+  console.log("Client detected disconnect:", reason);
+});
 
     return () => {
       socket.off("userJoined", handleUserJoined);

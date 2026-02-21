@@ -7,11 +7,15 @@ import { useAuth } from "./contexts/AuthProvider.jsx";
 function App() {
   const { userData } = useAuth();
 
-  useEffect(() => {
-    if(!userData) return
-    socket.connect(); 
-    return () => socket.disconnect(); // optional cleanup
-  }, [userData]);
+useEffect(() => {
+  if (userData && !socket.connected) {
+    socket.connect();
+  }
+
+  if (!userData && socket.connected) {
+    socket.disconnect();
+  }
+}, [userData]);
 
   return (
     <RoutingSetup />
