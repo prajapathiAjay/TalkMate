@@ -30,10 +30,23 @@ const response=await FriendModel.find({userId}).populate("friendId",  "name emai
 
 
 
-export const addFriendRepo=async(friend)=>{
+export const addFriendRepo=async(userId,friendId)=>{
     
     try{
-        const response=await FriendModel.create(fried)
+        const existingFriend=await FriendModel.findOne({userId,friendId})
+        if(existingFriend){
+            return {
+                success:false,
+                error:{
+                    statusCode:400,
+                    message:"Friend already exists"
+                }
+            }
+        }
+
+console.log("userId in repo",userId,"friendId",friendId)
+        const response=await FriendModel.create({userId,friendId})
+        console.log("Friend added successfully",response)
         return {
             success:true,
             status:200,

@@ -2,6 +2,7 @@
 
 import { UserModel } from "./user.schema.js"
 import { RoomModel } from "../room/room.schema.js"
+import { FriendModel } from "../friend/friend.schema.js"
 import bcrypt from "bcrypt"
 
 
@@ -105,15 +106,34 @@ export const userSignInRepo = async (data) => {
 }
 
 
-export const getAllUsersRepo = async () => {
+export const getAllUsersRepo = async (id, isOnline) => {
 
     try {
-        const getAllUser = await UserModel.find().select("-password")
+         const filter = {};
+
+    if (isOnline !== undefined) {
+      filter.isOnline = isOnline === "true";
+    }
+        const getAllUser = await UserModel.find(filter).select("-password")
+
+        const  allFriends=await FriendModel.find({ userId: { $eq: id } })
+
+
+        const friendsIds = allFriends.map(friend => friend.friendId.toString());
+
+      const gestAlluserWithFriendStatus=getAllUser.map((user)=>({
+        ...user.toObject(),
+        isFriend: friendsIds.includes(user._id.toString())
+      }))
+
+
+    
+
         return {
             success: true,
             status: 200,
             message: "All Users Fetched Successfully",
-            data: getAllUser
+            data: gestAlluserWithFriendStatus
         }
 
 

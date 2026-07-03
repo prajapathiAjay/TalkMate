@@ -5,27 +5,20 @@ import { roomCreationRepo,getRoomDataRepo } from "./room.repository.js";
 
 
 export const roomCreation = async (req,res,next) => {
-    const {roomName,type,} = req.body;
-    const roomData={
-        roomName:roomName,
-        type:type,
-        createdBy:req.user.id,
-        // admins:req.user.id,
-        admins: [req.user.id],
-        participants: [req.user.id],
-
-    }
+    const {roomName,type} = req.body;
+    console.log("roombody",req.body)
+    
 
     try {
 
-        const resp = await roomCreationRepo(roomData)
+        const resp = await roomCreationRepo(req.body)
 
 
         if (resp.success) {
             return res.status(201).json({
                 successs: true,
                 message: resp?.message,
-                // data: resp.data
+                data: resp.data
             })
 
         }

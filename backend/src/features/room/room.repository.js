@@ -3,7 +3,7 @@ import { RoomModel } from "./room.schema.js"
 export const roomCreationRepo = async (roomData) => {
 
     try {
-        if (!roomData?.roomName || !roomData?.type) {
+        if ( !roomData?.type) {
             return {
                 success: false,
                 error: {
@@ -36,7 +36,7 @@ export const roomCreationRepo = async (roomData) => {
             success: true,
             status: 201,
             message: `New room with name:${newRoom?.roomName} has been created uccessfully`,
-
+            data: newRoom
 
 
         }

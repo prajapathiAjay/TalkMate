@@ -23,7 +23,7 @@ isOnline:{
 },
 lastSeen:{
     type:Date,
-    default:null
+    default:Date.now
 }
 
 

@@ -15,10 +15,19 @@ export const userRegisteration = async (req, res, next) => {
     });
 
     if (resp.success) {
+
+      const token = jwt.sign(
+        { id: resp.data.user.userId },
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" }
+      )
+
+
       return res.status(201).json({
         success: true,
         message: resp.message,
         data: resp.data,
+        token
       });
     }
 
@@ -75,16 +84,16 @@ export const userSignIn = async (req, res, next) => {
       //     data: response.data
       //   })
 
- return res.status(200).json({
-      success: true,
-      message: response.message,
-      token,
-      data: response.data,
-    })
+      return res.status(200).json({
+        success: true,
+        message: response.message,
+        token,
+        data: response.data,
+      })
 
 
     }
-   
+
 
     // ✅ Proper error forwarding
     return next(
@@ -135,7 +144,10 @@ export const userLogout = async (req, res, next) => {
 export const getAllUsers = async (req, res, next) => {
 
   try {
-    const allUsers = await getAllUsersRepo()
+    console.log("request query", req.query)
+    const { isOnline } = req.query
+
+    const allUsers = await getAllUsersRepo(req?.user?.id, isOnline)
 
     if (allUsers.success) {
       return res.status(200).json({

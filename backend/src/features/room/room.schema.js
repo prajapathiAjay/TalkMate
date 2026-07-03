@@ -3,11 +3,11 @@ import mongoose from "mongoose";
 const roomSchema = new mongoose.Schema({
     roomName: {
         type: String,
-        // required: true,
+        required: false,
         // unique: true,
         index: true,
         // required: true,
-        unique:true
+        // unique:true
 
     },
     type: {
@@ -30,7 +30,8 @@ const roomSchema = new mongoose.Schema({
 
     admins: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
+        ref: "User",
+        default:null
     }]
 
 }, { timestamps: true }
