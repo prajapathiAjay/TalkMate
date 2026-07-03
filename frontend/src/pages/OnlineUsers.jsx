@@ -17,21 +17,38 @@ import {
   ChevronLeft,
   Activity,
   Coffee,
+  UserPlus2,
+  Users2Icon,
+  MessageSquareText,
+
+
+  Handshake,
 } from "lucide-react";
 import CustomApiService from "../services/CustomApiService";
 import socket from "../Socket.jsx";
+import { useAuth } from "../contexts/AuthProvider.jsx";
+import { toast } from "sonner";
 
 const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
-  const { GET } = CustomApiService();
-  const [AllUSers, setAllUsers] = useState([]);
+  const { GET, POST } = CustomApiService();
+  const [allUsers, setAllUsers] = useState([]);
+  const { userData,roomType,setRoomType } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
-
+console.log("allUsers",allUsers)
   const getAllUsers = async () => {
     try {
+      const params={
+        
+       
+      }
+       if (selectedFilter !== "all") {
+      params.isOnline = selectedFilter;
+    }
+
       setIsLoading(true);
-      const res = await GET("user/allUsers", {}, {}, {});
+      const res = await GET("user/allUsers", params, {}, {});
       if (res?.success) {
         const allUsersData = res?.data;
         setAllUsers(allUsersData);
@@ -42,6 +59,7 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
       setIsLoading(false);
     }
   };
+
   const handleStatusChange = (response) => {
     if (response.success) {
       let newJoinedUsers = response?.data;
@@ -60,17 +78,77 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
     }
     console.log("handleStatus", response);
   };
+
+  // Add as Friend Functionality
+  const handleAddFriend = async (friendId) => {
+    try {
+      const payload = {
+        friendId: friendId,
+        userId: userData?.user?.userId,
+      };
+
+      const response = await POST("friend/add", {}, {}, payload);
+      if (response?.success) {
+        toast.success(`${response?.message?.data?.message}`);
+        console.log("Friend added successfully", response);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    ;
+  };
+
+  const getAllFriends = async () => {
+    try {
+      const response = await GET("friend/getFriends", {}, {}, {});
+    
+      if (response?.success) {
+        setAllUsers(response?.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
+  const createChatRoom=async(friendId)=>{
+try {
+  const payload={
+type:"private",
+ participants:[userData?.user?.userId,friendId]
+  }
+
+  const response=await POST("room/createRoom",{},{},payload)
+  if(response?.success){
+    console.log("Chat room created successfully", response.data);
+  }
+
+
+
+  
+} catch (error) {
+  console.log("Error creating chat room:", error);
+}
+
+
+
+  }
+
   useEffect(() => {
-    getAllUsers();
+   
     socket.on("user-status-changed", handleStatusChange);
   }, []);
+  useEffect(()=>{
+ getAllUsers();
+  },[selectedFilter])
+  
 
-  const filteredUsers = AllUSers.filter((user) => {
-    const matchesSearch = user.name
+  const filteredUsers = allUsers.filter((user) => {
+    const matchesSearch = user?.name || user?.friendId?.name
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
     const matchesFilter =
-      selectedFilter === "all" || user.isOnline === selectedFilter;
+      selectedFilter === "all"||selectedFilter === "friends" || user?.isOnline === selectedFilter;
     return matchesSearch && matchesFilter;
   });
 
@@ -118,12 +196,12 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
     }
   };
 
-  const onlineCount = AllUSers.filter((u) => u.isOnline === true);
-  const awayCount = AllUSers.filter((u) => u.isOnline === false);
-  const offlineCount = AllUSers.filter((u) => u.status === "offline");
+  const onlineCount = allUsers.filter((u) => u.isOnline === true);
+  const awayCount = allUsers.filter((u) => u.isOnline === false);
+  const offlineCount = allUsers.filter((u) => u.status === "offline");
 
   // Featured users (for demo - you can modify based on your data)
-  const featuredUsers = AllUSers.filter(
+  const featuredUsers = allUsers.filter(
     (u) => u.isFeatured || u.status === "online",
   ).slice(0, 3);
 
@@ -140,36 +218,49 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
         border-l border-indigo-100
       `}
     >
-      
       {/* Header with Gradient */}
-      <div className="flex items-center bg-[#7736FB]/10 border-2 border-indigo-200 px-2 py-1 relative overflow-hidden">
-       
-       <div onClick={handleShowOnlineUsers } className="block md:hidden flex items-center h-full w-8 text-[#7736FB]  rounded-lg bg-white border-2 border-indigo-200 hover:bg-indigo-50 cursor-pointer justify-center mr-3">
-        <ChevronLeft className="w-5 h-20 " />
-       </div>
-
-        <div className="flex flex-wrap items-between justify-evenly ">
-          <button className="cursor-pointer px-4 py-2 rounded-xl bg-white/20 backdrop-blur-md border border-white/30 text-[#7736FB] font-semibold shadow-lg hover:bg-[#7736FB]/30 hover:scale-105 transition-all duration-300">
-            👥 Friends
-          </button>
-
-          <button onClick={() => setSelectedFilter(true)} className="cursor-pointer px-4 py-2 rounded-xl bg-green-500/20 border border-green-300/30 text-[#7736FB] font-semibold shadow-lg hover:bg-green-500/30 hover:scale-105 transition-all duration-300">
-            ⚡ Online
-          </button>
-
-          <button  onClick={() => setSelectedFilter(false)} className="cursor-pointer px-4 py-2 rounded-xl bg-gray-500/20 border border-gray-300/30 text-[#7736FB] font-semibold shadow-lg hover:bg-gray-500/30 hover:scale-105 transition-all duration-300">
-            🌙 Offline
-          </button>
-
-          <button  onClick={() => setSelectedFilter("all")} className="cursor-pointer px-4 py-2 rounded-xl bg-blue-500/20 border border-blue-300/30 text-[#7736FB] font-semibold shadow-lg hover:bg-blue-500/30 hover:scale-105 transition-all duration-300">
-            🌍 All Users
-          </button>
-
-          <button className="cursor-pointer px-4 py-2 rounded-xl bg-purple-500/20 border border-purple-300/30 text-[#7736FB] font-semibold shadow-lg hover:bg-purple-500/30 hover:scale-105 transition-all duration-300">
-            👨‍👩‍👧 Groups
-          </button>
+      <div className="flex items-center  border-5 border-indigo-200 px-2 py-1 relative overflow-hidden">
+        <div
+          onClick={handleShowOnlineUsers}
+          className="block md:hidden flex items-center h-full w-8 text-[#7736FB]  rounded-lg bg-white border-2 border-indigo-200 hover:bg-indigo-50 cursor-pointer justify-center mr-3"
+        >
+          <ChevronLeft className="w-5 h-20 " />
         </div>
-       
+
+        <div className="flex flex-wrap items-between justify-evenly gap-y-2 ">
+           <button
+            onClick={() => setSelectedFilter("all")}
+            className={`flex cursor-pointer px-4 py-2 items-center rounded-xl ${selectedFilter === "all" ? "bg-[#7736FB] border border-[#7736FB]/30 text-white" : "bg-white/20 border border-[#7736FB]/30 text-[#7736FB]"} font-semibold shadow-lg hover:bg-[#7736FB]/30 hover:scale-105 transition-all duration-300`}
+          >
+            <Users2Icon className="w-4 h-4 mr-2" /> All Users
+          </button>
+          <button
+            onClick={() =>{setSelectedFilter("friends"); getAllFriends()}}
+            className={`flex cursor-pointer px-4 py-2 items-center rounded-xl ${selectedFilter === "friends" ? "bg-[#7736FB] border border-[#7736FB]/30 text-white" : "bg-white/20 border border-[#7736FB]/30 text-[#7736FB]"} font-semibold shadow-lg hover:bg-[#7736FB]/30 hover:scale-105 transition-all duration-300`}
+          >
+           <Handshake className="w-4 h-4 mr-2" /> Friends
+          </button>
+
+          <button
+            onClick={() => setSelectedFilter(true)}
+            className={`flex cursor-pointer px-4 py-2 items-center rounded-xl ${selectedFilter === true ? "bg-[#7736FB] border border-[#7736FB]/30 text-white" : "bg-white/20 border border-[#7736FB]/30 text-[#7736FB]"} font-semibold shadow-lg hover:bg-[#7736FB]/30 hover:scale-105 transition-all duration-300`}
+          >
+          <Wifi className="w-4 h-4 mr-2" />  Online
+          </button>
+
+          <button
+            onClick={() => setSelectedFilter(false)}
+            className={`flex cursor-pointer px-4 py-2 items-center rounded-xl ${selectedFilter === false ? "bg-[#7736FB] border border-[#7736FB]/30 text-white" : "bg-white/20 border border-[#7736FB]/30 text-[#7736FB]"} font-semibold shadow-lg hover:bg-[#7736FB]/30 hover:scale-105 transition-all duration-300`}
+          >
+           <WifiOff className="w-4 h-4 mr-2" /> Offline
+          </button>
+
+         
+
+          {/* <button className={`cursor-pointer px-4 py-2 rounded-xl ${selectedFilter === "groups" ? "bg-[#7736FB]/20 border border-[#7736FB]/30 text-white" : "bg-white/20 border border-white/30 text-[#7736FB]"} font-semibold shadow-lg hover:bg-[#7736FB]/30 hover:scale-105 transition-all duration-300`}>
+            👨‍👩‍👧 Groups
+          </button> */}
+        </div>
       </div>
 
       {/* Search Section */}
@@ -194,7 +285,6 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
         </div>
 
         {/* Filter Pills */}
-        
       </div>
 
       {/* Users List */}
@@ -239,7 +329,7 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
                       <div
                         className={`relative w-14 h-14 rounded-2xl bg-gradient-to-br ${user.isOnline ? "from-green-400 to-blue-500" : "from-gray-400 to-gray-500"} flex items-center justify-center text-white font-bold text-xl shadow-lg`}
                       >
-                        {user.name.charAt(0).toUpperCase()}
+                        {user?.name?.charAt(0).toUpperCase() || user?.friendId?.name?.charAt(0).toUpperCase()}
                       </div>
                     )}
                     <div
@@ -251,7 +341,7 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-1">
                       <h3 className="font-bold text-gray-800 group-hover:text-blue-600 transition-colors">
-                        {user.name}
+                        {user.name || user?.friendId?.name}
                       </h3>
                       {/* <div
                         className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getBadgeColor(user.isOnline)} border`}
@@ -284,16 +374,34 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
                         </span>
                       )}
                     </div>
-        
                   </div>
 
                   {/* Action Button with animation */}
-                  <button className="absolute right-4 opacity-50 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0">
-                    <div className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white p-3 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:scale-110">
-                      <MessageCircle className="w-4 h-4" />
+                  {selectedFilter==="friends"&&<button
+                    onClick={() => handleAddFriend(user._id)}
+                    className="absolute right-4 opacity-70 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0"
+                   
+                  >
+                    <div
+                     title={ "Start Chat"} className="text-red-500 p-3 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:scale-110">
+                     <MessageSquareText className="w-4 h-4" />
                     </div>
-                     
-                  </button>
+                  </button>}
+                  
+                  
+                   {selectedFilter!=="friends"&&<button
+                    onClick={
+                      (user?.isFriend ? () => createChatRoom(user._id) : () => handleAddFriend(user._id)  )
+                      
+                      
+                     }
+                    className="absolute right-4 opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0"
+                  >
+                    <div
+                     title={user?.isFriend ? "Start Chat" : "Add Friend"} className=" text-red-500 p-3 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:scale-110">
+                    { user?.isFriend ? <MessageSquareText className="w-4 h-4"  /> : <UserPlus2 className="w-4 h-4" /> }
+                    </div>
+                  </button>}
                 </div>
 
                 {/* Progress/Activity bar (optional) */}
@@ -359,7 +467,7 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
             <span className="font-bold text-blue-600">
               {filteredUsers.length}
             </span>
-            <span className="text-gray-400">/ {AllUSers.length}</span>
+            <span className="text-gray-400">/ {allUsers.length}</span>
             <ChevronRight className="w-4 h-4 text-gray-400" />
           </div>
         </div>
