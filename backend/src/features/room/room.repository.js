@@ -3,7 +3,7 @@ import { RoomModel } from "./room.schema.js"
 export const roomCreationRepo = async (roomData) => {
 
     try {
-        if ( !roomData?.type) {
+        if (!roomData?.type) {
             return {
                 success: false,
                 error: {
@@ -15,17 +15,25 @@ export const roomCreationRepo = async (roomData) => {
         let existingRoom
 
         if (roomData?.type === "private") {
-            const users = roomData.participants
             existingRoom = await RoomModel.findOne({
                 type: "private", participants: {
-                    $all: users,
-                    $size: users.length
+                    $all: roomData.participants,
+                    // $size: users.length
                 }
             })
 
-
-
         }
+
+
+        if (existingRoom) {
+    return {
+        success: false,
+        error: {
+            statusCode: 400,
+            message: "Room already exists for chat"
+        }
+    };
+}
 
 
 
@@ -69,35 +77,51 @@ export const roomCreationRepo = async (roomData) => {
 
 
 
-export const getRoomDataRepo=async (data)=>{
+export const getRoomDataRepo = async (data) => {
 
 
     try {
-        if(data?.type==="public"){
+        if (data?.type === "public") {
 
-const roomData=await RoomModel.findOne({type:data?.type})
+            const roomData = await RoomModel.findOne({ type: data?.type })
 
-            return{
-                success:true,
-                status:200,
-                data:roomData
+            return {
+                success: true,
+                status: 200,
+                data: roomData
 
             }
+        } else if (data?.type === "private") {
+
+
+
+            console.log("private", data)
+            const roomData = await RoomModel.find({ type: "private", participants: { $in: data?.participantIds } })
+
+            return {
+                success: true,
+                status: 200,
+                data: roomData
+
+            }
+
         }
 
-      return {
-            success: true,
-            status: 201,
-            message: `New room with name has been created uccessfully`,
 
 
 
-        }
 
-   
-        
     } catch (error) {
-        
+          return {
+            success: false,
+            error: {
+                statusCode: 500,
+                message: error
+            }
+
+
+        }
+
     }
 
 

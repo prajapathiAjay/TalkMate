@@ -109,25 +109,25 @@ export const userSignInRepo = async (data) => {
 export const getAllUsersRepo = async (id, isOnline) => {
 
     try {
-         const filter = {};
+        const filter = {};
 
-    if (isOnline !== undefined) {
-      filter.isOnline = isOnline === "true";
-    }
+        if (isOnline !== undefined) {
+            filter.isOnline = isOnline === "true";
+        }
         const getAllUser = await UserModel.find(filter).select("-password")
 
-        const  allFriends=await FriendModel.find({ userId: { $eq: id } })
+        const allFriends = await FriendModel.find({ userId: { $eq: id } })
 
 
         const friendsIds = allFriends.map(friend => friend.friendId.toString());
 
-      const gestAlluserWithFriendStatus=getAllUser.map((user)=>({
-        ...user.toObject(),
-        isFriend: friendsIds.includes(user._id.toString())
-      }))
+        const gestAlluserWithFriendStatus = getAllUser.map((user) => ({
+            ...user.toObject(),
+            isFriend: friendsIds.includes(user._id.toString())
+        }))
 
 
-    
+
 
         return {
             success: true,
@@ -164,7 +164,7 @@ export const getAllUsersRepo = async (id, isOnline) => {
 // ******SOCKET REPO FUNCTIONS______________ 
 ////////////////////////////////////////////////////////////////       
 
-export const handleOnlineUsersrepo = async (onlineStatus,userId) => {
+export const handleOnlineUsersrepo = async (onlineStatus, userId) => {
     const publicRoomData = await RoomModel.findOne({ type: "public" })
 
 

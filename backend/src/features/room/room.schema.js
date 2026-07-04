@@ -6,8 +6,9 @@ const roomSchema = new mongoose.Schema({
         required: false,
         // unique: true,
         index: true,
-        // required: true,
-        // unique:true
+        required: true,
+        unique:true,
+         default: () => `room_${new mongoose.Types.ObjectId()}`
 
     },
     type: {
