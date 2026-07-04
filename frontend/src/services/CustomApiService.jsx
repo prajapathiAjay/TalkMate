@@ -1,5 +1,5 @@
 import axios from "axios";
-
+import qs from "qs"
 // Create a single axios instance (singleton)
 
 // const apiClient = axios.create({
@@ -29,6 +29,10 @@ import axios from "axios";
 
 const apiClient = axios.create({
   baseURL: `${import.meta.env.VITE_API_URL}/${import.meta.env.VITE_APP_NAME}`,
+    paramsSerializer: (params) =>
+    qs.stringify(params, {
+      arrayFormat: "repeat",
+    }),
 });
 
 // ✅ Request Interceptor

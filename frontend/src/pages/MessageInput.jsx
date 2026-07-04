@@ -9,13 +9,13 @@ import { Send, SendHorizonal, Loader2 } from "lucide-react";
 const MessageInput = ({ roomType, disabled = false }) => {
   const { POST } = CustomeApiService();
 
-  const { userData } = useAuth();
+  const { userData,chatRoomId } = useAuth();
   const [newMsg, setNewMsg] = useState("");
   const [files, setFiles] = useState([]);
   const [sending, setSending] = useState(false);
   let userName = userData?.user?.name;
   let userId = userData?.user?.userId;
-  let publicRoomId = userData?.user?.publicRoomId;
+  // let chatRoomId = userData?.user?.chatRoomId;
   const TypingTimeOutRef = useRef(null);
   const isTypingRef = useRef(false);
   const emojiPickerRef = useRef(null);
@@ -55,7 +55,7 @@ const MessageInput = ({ roomType, disabled = false }) => {
       isTypingRef.current = true;
       socket.emit("typing", {
         name: userName,
-        roomId: publicRoomId,
+        roomId: chatRoomId,
         userId: userId,
       });
 
@@ -65,7 +65,7 @@ const MessageInput = ({ roomType, disabled = false }) => {
         isTypingRef.current = false;
         socket.emit("stop-typing", {
           name: userName,
-          roomId: publicRoomId,
+          roomId: chatRoomId,
           userId: userId,
         });
       }, 2000);
@@ -115,7 +115,7 @@ const MessageInput = ({ roomType, disabled = false }) => {
       };
 
       if (roomType === "public") {
-        messageData.roomId = publicRoomId;
+        messageData.roomId = chatRoomId;
       }
      console.log("message Data",messageData)
       socket.emit("sendMessage", messageData);

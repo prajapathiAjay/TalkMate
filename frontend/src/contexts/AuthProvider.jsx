@@ -9,23 +9,60 @@ const AuthProvider = ({ children }) => {
     return availablUser ? JSON.parse(availablUser) : null;
   });
 
+  
+  const [roomType, setRoomType] = useState(() => {
+    const availableRoomType = localStorage.getItem("roomType");
+    return availableRoomType ? availableRoomType : null;
+  });
+
+
+
+  const [chatRoomId,setChatRoomId]=useState(()=>{
+
+const availableRoomId=localStorage.getItem("chatRoomId");
+return  localStorage.getItem("chatRoomId");
+
+  })
+
    useEffect(()=>{
     if(userData){
         localStorage.setItem("userData",JSON.stringify(userData));
     }else{
         localStorage.removeItem("userData");
     }
+   
    },[userData]);
+
+   const handleChatRoomIdChange = (newChatRoomId) => {
+    setChatRoomId(newChatRoomId);
+  }
+
+   useEffect(() => {
+  if (chatRoomId) {
+    localStorage.setItem("chatRoomId", chatRoomId);
+  } else {
+    localStorage.removeItem("chatRoomId");
+  }
+}, [chatRoomId]);
+
+const handleRoomTypeChange = (newRoomType) => {
+    setRoomType(newRoomType);
+    localStorage.setItem("roomType", newRoomType);
+  }
 
   const login = (data) => {
     setUserData(data);
+    setChatRoomId(data?.user?.publicRoomId || null);
+    setRoomType("private");
   };
   const logout = () => {
     setUserData(null);
+    setChatRoomId(null);
+    setRoomType(null);
   };
 
   return (
-    <AuthContext.Provider value={{ userData, login, logout }}>
+    <AuthContext.Provider value={{ userData, chatRoomId,roomType,setRoomType, login, logout,handleChatRoomIdChange }}>
       {children}
     </AuthContext.Provider>
   );

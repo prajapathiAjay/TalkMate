@@ -16,11 +16,11 @@ import { toast } from "sonner";
 
 const Chat = () => {
   const { GET } = CustomeApiService();
-  const { userData } = useAuth();
-
+  const { userData,chatRoomId } = useAuth();
+  console.log("dataroom",userData,chatRoomId)
   let userId = userData?.user?.userId;
   let userName = userData?.user?.name;
-  let roomId = userData?.user?.publicRoomId;
+  // let chatRoomId = userData?.user?.publicRoomId;
   console.log("User Data in Chat Component:", userData);
   const [currentUser, setCurrentUser] = useState(userData?.user?.userId);
   const [messages, setMessages] = useState([]);
@@ -29,7 +29,7 @@ const Chat = () => {
   const [isAtBottom, setIsAtBottom] = useState(true);
   const [roomType, setRoomType] = useState("public");
   const [showOnlineUsers, setShowOnlineUsers] = useState(false);
-  // const [roomId, setRoomId] = useState(roomId || null);
+  // const [chatRoomId, setRoomId] = useState(chatRoomId || null);
   console.log("currentUser", currentUser);
   const messagesEndRef = useRef(null);
   // console.log("sendt message", newMsg);
@@ -109,17 +109,17 @@ const Chat = () => {
 //   useEffect(() => {
 //        console.log("JOIN EFFECT", {
 //     currentUser,
-//     roomId,
+//     chatRoomId,
 //     connected: socket.connected,
 //   });
 
-//      if (!currentUser || !roomId) return;
+//      if (!currentUser || !chatRoomId) return;
 // console.log("Socket connected?", socket.connected,socket.id);
 //  socket.on("connect", () => {
 //     console.log("Connected:",socket.connected, socket.id);
 //      socket.emit(
 //       "join-room",
-//       { roomId: roomId, userName: userName },
+//       { chatRoomId: chatRoomId, userName: userName },
 //       handleJoinRoom,
 //     );
 //   });
@@ -141,17 +141,17 @@ const Chat = () => {
 //       // socket.off("joinSuccess", handleJoinSuccess);
 //       socket.off("message", handleMessage);
 //     };
-//   }, [currentUser, roomId]);
+//   }, [currentUser, chatRoomId]);
 
 
 useEffect(() => {
   console.log("JOIN EFFECT", {
     currentUser,
-    roomId,
+    chatRoomId,
     connected: socket.connected,
   });
 
-  if (!currentUser || !roomId) return;
+  if (!currentUser || !chatRoomId) return;
 
   const joinRoom = () => {
     console.log("Joining Room...");
@@ -160,7 +160,7 @@ useEffect(() => {
     socket.emit(
       "join-room",
       {
-        roomId,
+       roomId: chatRoomId,
         userName,
       },
       handleJoinRoom
@@ -201,7 +201,7 @@ useEffect(() => {
     socket.off("connect_error", handleConnectError);
     socket.off("disconnect", handleDisconnect);
   };
-}, [currentUser, roomId, userName]);
+}, [currentUser, chatRoomId]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
