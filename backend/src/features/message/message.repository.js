@@ -26,8 +26,8 @@ export const createMessageRepository = async (messageData) => {
 export const getMessageRepo = async (getmsgPayload) => {
 
     try {
-        const { type } = getmsgPayload
-        const messages = await MessageModel.find({ type })
+        const { roomId } = getmsgPayload
+        const messages = await MessageModel.find({ roomId:roomId })
 
         return ({
             success: true,

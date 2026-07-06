@@ -4,10 +4,10 @@ import { customErrorHandler } from "../../middlewares/errorHandler.js"
 
 export const getMessage= async (req,res,next)=>{
 
-const {type}=req?.query
+const payload=req?.query
 try{
 
-    const messages=await getMessageRepo(type)
+    const messages=await getMessageRepo(payload)
     if(messages.success){
 
         return res.status(200).json({
