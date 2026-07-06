@@ -1,4 +1,5 @@
 import { RoomModel } from "./room.schema.js"
+import mongoose from "mongoose"
 
 export const roomCreationRepo = async (roomData) => {
 
@@ -125,6 +126,78 @@ export const getRoomDataRepo = async (data) => {
     }
 
 
+
+
+
+
+}
+
+
+
+
+
+
+export const roomDatawithseenRepo=async(data,Id)=>{
+ const myId=new mongoose.Types.ObjectId(Id)
+ 
+
+try {
+    
+const response = await RoomModel.aggregate([
+    
+  {
+    $match: {
+      type: "private",
+      participants: myId
+    }
+  },
+  {
+    $lookup: {
+      from: "users",
+      let: {
+        participants: "$participants"
+      },
+      pipeline: [
+        {
+          $match: {
+            $expr: {
+              $and: [
+                { $in: ["$_id", "$$participants"] }, // User is in participants
+                { $ne: ["$_id", myId] }              // User is NOT me
+              ]
+            }
+          }
+        },
+        {
+          $project: {
+            password: 0
+          }
+        }
+      ],
+      as: "friend"
+    }
+  },
+  {
+    $unwind: "$friend"
+  }
+]);
+
+return{
+    success:true,
+    status:200,
+    message:"private room dat fetched Successfully",
+    data:response
+}
+
+
+console.log("response",response)
+
+
+
+} catch (error) {
+    console.log("error",error)
+    
+}
 
 
 
