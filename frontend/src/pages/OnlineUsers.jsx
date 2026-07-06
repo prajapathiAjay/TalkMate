@@ -30,7 +30,7 @@ import { toast } from "sonner";
 const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
   const { GET, POST } = CustomApiService();
   const [allUsers, setAllUsers] = useState([]);
-  const { userData, chatRoomId, handleChatRoomIdChange } = useAuth();
+  const { userData, chatRoomId, handleChatRoomIdChange, handleRoomTypeChange } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
   const [isLoading, setIsLoading] = useState(false);
@@ -217,6 +217,11 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
     }
   };
 
+  const handleChatRoomChange=(roomId)=>{
+    handleChatRoomIdChange(roomId)
+    handleRoomTypeChange("private")
+
+  }
   const onlineCount = allUsers.filter((u) => u.isOnline === true);
   const awayCount = allUsers.filter((u) => u.isOnline === false);
   const offlineCount = allUsers.filter((u) => u.status === "offline");
@@ -225,6 +230,19 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
   const featuredUsers = allUsers
     .filter((u) => u.isFeatured || u.isOnline === true)
     .slice(0, 3);
+
+
+
+
+    const date=(date)=>{
+      const newDate=new Date(date).toLocaleDateString("en-IN",{day: "numeric",
+
+                                month: "short",
+                                hour: "numeric",
+                                minute: "2-digit",})
+                                return newDate
+
+    }
 
   return (
     <div
@@ -270,6 +288,12 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
             className={`flex cursor-pointer px-4 py-2 items-center rounded-xl ${selectedFilter === true ? "bg-[#7736FB] border border-[#7736FB]/30 text-white" : "bg-white/20 border border-[#7736FB]/30 text-[#7736FB]"} font-semibold shadow-lg hover:bg-[#7736FB]/30 hover:scale-105 transition-all duration-300`}
           >
             <Wifi className="w-4 h-4 mr-2" /> Online
+          </button>
+            <button
+            onClick={() => setSelectedFilter(true)}
+            className={`flex cursor-pointer px-4 py-2 items-center rounded-xl ${selectedFilter === true ? "bg-[#7736FB] border border-[#7736FB]/30 text-white" : "bg-white/20 border border-[#7736FB]/30 text-[#7736FB]"} font-semibold shadow-lg hover:bg-[#7736FB]/30 hover:scale-105 transition-all duration-300`}
+          >
+            <Wifi className="w-4 h-4 mr-2" /> Public Chat
           </button>
 
           <button
@@ -333,7 +357,7 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
               {friendRoom.map((room) => (
                 <div
                   key={room._id}
-                  onClick={() => handleChatRoomIdChange(room._id)}
+                  onClick={() => handleChatRoomChange(room._id)}
                   className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:border-purple-200 cursor-pointer transition-all duration-300 p-4"
                 >
                   <div className="flex items-center justify-between">
@@ -368,7 +392,11 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
                         >
                           {room.friend?.isOnline
                             ? "Online"
-                            : `Last seen ${new Date(
+                            : `Last seen ${date(room?.friend?.lastSeen)}`}
+                            
+                            
+{/*                             
+                            `Last seen ${new Date(
                                 room.friend?.lastSeen,
                               ).toLocaleDateString("en-IN", {
                                 day: "numeric",
@@ -376,7 +404,7 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
                                 month: "short",
                                 hour: "numeric",
                                 minute: "2-digit",
-                              })}`}
+                              })}`} */}
                         </p>
                       </div>
                     </div>

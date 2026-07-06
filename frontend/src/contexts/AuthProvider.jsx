@@ -12,7 +12,7 @@ const AuthProvider = ({ children }) => {
   
   const [roomType, setRoomType] = useState(() => {
     const availableRoomType = localStorage.getItem("roomType");
-    return availableRoomType ? availableRoomType : null;
+    return availableRoomType ? availableRoomType : "public";
   });
 
 
@@ -55,7 +55,7 @@ const handleRoomTypeChange = (newRoomType) => {
   const login = (data) => {
     setUserData(data);
     setChatRoomId(data?.user?.publicRoomId || null);
-    setRoomType("private");
+    setRoomType("public");
   };
   const logout = () => {
     setUserData(null);

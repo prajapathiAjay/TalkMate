@@ -16,7 +16,7 @@ import { toast } from "sonner";
 
 const Chat = () => {
   const { GET } = CustomeApiService();
-  const { userData,chatRoomId } = useAuth();
+  const { userData,chatRoomId,roomType } = useAuth();
   console.log("dataroom",userData,chatRoomId)
   let userId = userData?.user?.userId;
   let userName = userData?.user?.name;
@@ -27,7 +27,7 @@ const Chat = () => {
   console.log("messagesss",messages)
   const [editRoom,setEditRoom] = useState(false);
   const [isAtBottom, setIsAtBottom] = useState(true);
-  const [roomType, setRoomType] = useState("public");
+  // const [roomType, setRoomType] = useState("public");
   const [showOnlineUsers, setShowOnlineUsers] = useState(false);
   // const [chatRoomId, setRoomId] = useState(chatRoomId || null);
   console.log("currentUser", currentUser);
@@ -72,10 +72,17 @@ const Chat = () => {
   };
 
   const fetchAllMessages = async () => {
+  const params={
+    roomId:chatRoomId
+  }
+
+
+
+    
     try {
       const response = await GET(
         "messages/getMessages",
-        { type: roomType },
+       params,
         {},
         {},
       );
@@ -106,9 +113,10 @@ const Chat = () => {
 
 
 
-// useEffect(()=>{
-// setMessages([])
-// }.[chatRoomId])
+useEffect(()=>{
+setMessages([])
+ fetchAllMessages();
+},[chatRoomId])
 
   // console.log("Messagest", messages);
 
