@@ -23,7 +23,7 @@ const availableRoomId=localStorage.getItem("chatRoomId");
 return  localStorage.getItem("chatRoomId");
 
   })
-
+ console.log("chatroom Id",chatRoomId)
    useEffect(()=>{
     if(userData){
         localStorage.setItem("userData",JSON.stringify(userData));
@@ -35,6 +35,7 @@ return  localStorage.getItem("chatRoomId");
 
    const handleChatRoomIdChange = (newChatRoomId) => {
     setChatRoomId(newChatRoomId);
+     localStorage.setItem("chatRoomId", newChatRoomId)
   }
 
    useEffect(() => {
@@ -46,6 +47,7 @@ return  localStorage.getItem("chatRoomId");
 }, [chatRoomId]);
 
 const handleRoomTypeChange = (newRoomType) => {
+  
     setRoomType(newRoomType);
     localStorage.setItem("roomType", newRoomType);
   }

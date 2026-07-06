@@ -98,10 +98,17 @@ const Chat = () => {
   //     console.error("Error fetching room data:", error);
   //   }
   // };
+  
 
   useEffect(() => {
     fetchAllMessages();
   }, []);
+
+
+
+// useEffect(()=>{
+// setMessages([])
+// }.[chatRoomId])
 
   // console.log("Messagest", messages);
 

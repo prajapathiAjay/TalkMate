@@ -34,6 +34,7 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
   const [isLoading, setIsLoading] = useState(false);
+  const [friendRoom, setFriendRoom] = useState([]);
   console.log("allUsers", allUsers);
 
   const getAllUsers = async () => {
@@ -91,37 +92,36 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
   };
 
   // Add as Friend Functionality
- 
 
   const handleAddFriend = async (friendId) => {
-  try {
-    const payload = {
-      friendId,
-      userId: userData?.user?.userId,
-    };
+    try {
+      const payload = {
+        friendId,
+        userId: userData?.user?.userId,
+      };
 
-    const roomPayload = {
-      type: "private",
-      participants: [userData?.user?.userId, friendId],
-    };
+      const roomPayload = {
+        type: "private",
+        participants: [userData?.user?.userId, friendId],
+      };
 
-    const [roomResponse, friendResponse] = await Promise.all([
-      POST("room/createRoom", {}, {}, roomPayload),
-      POST("friend/add", {}, {}, payload),
-    ]);
+      const [roomResponse, friendResponse] = await Promise.all([
+        POST("room/createRoom", {}, {}, roomPayload),
+        POST("friend/add", {}, {}, payload),
+      ]);
 
-    if (roomResponse?.success) {
-      console.log("Chat room created successfully", roomResponse.data);
+      if (roomResponse?.success) {
+        console.log("Chat room created successfully", roomResponse.data);
+      }
+
+      if (friendResponse?.success) {
+        toast.success(friendResponse.message);
+        console.log("Friend added successfully", friendResponse);
+      }
+    } catch (error) {
+      console.error("Error:", error);
     }
-
-    if (friendResponse?.success) {
-      toast.success(friendResponse.message);
-      console.log("Friend added successfully", friendResponse);
-    }
-  } catch (error) {
-    console.error("Error:", error);
-  }
-};
+  };
 
   const getAllFriends = async () => {
     try {
@@ -135,7 +135,6 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
     }
   };
 
-
   const getPrivateRoom = async () => {
     try {
       const params = {
@@ -143,14 +142,10 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
         participants: [userData?.user?.userId],
       };
 
-      const response = await GET(
-        "room",
-      params,
-        {},
-        {},
-        
-      );
+      const response = await GET("room/private", params, {}, {});
       if (response.success) {
+        setFriendRoom(response?.data);
+        console.log("private room data", friendRoom);
       }
     } catch (error) {}
   };
@@ -159,9 +154,6 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
     socket.on("user-status-changed", handleStatusChange);
   }, []);
 
-
-
-  
   useEffect(() => {
     if (selectedFilter === "friends") {
       getPrivateRoom();
@@ -336,8 +328,67 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
                   </div>
                 </div>
               ))
-          ) : selectedFilter === "friends" && allUsers.length > 0 ? (
-            <div></div>
+          ) : selectedFilter === "friends" && friendRoom.length > 0 ? (
+            <div className="space-y-3">
+              {friendRoom.map((room) => (
+                <div
+                  key={room._id}
+                  onClick={() => handleChatRoomIdChange(room._id)}
+                  className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:border-purple-200 cursor-pointer transition-all duration-300 p-4"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      {/* Avatar */}
+                      <div className="relative">
+                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#7736FB] to-[#4F7CFF] flex items-center justify-center text-white text-xl font-bold">
+                          {room.friend?.name?.charAt(0)?.toUpperCase()}
+                        </div>
+
+                        <span
+                          className={`absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-white ${
+                            room.friend?.isOnline
+                              ? "bg-green-500"
+                              : "bg-gray-400"
+                          }`}
+                        />
+                      </div>
+
+                      {/* Name */}
+                      <div>
+                        <h2 className="font-bold text-lg text-gray-800">
+                          {room.friend?.name}
+                        </h2>
+
+                        <p
+                          className={`text-sm ${
+                            room.friend?.isOnline
+                              ? "text-green-500 font-medium"
+                              : "text-gray-500"
+                          }`}
+                        >
+                          {room.friend?.isOnline
+                            ? "Online"
+                            : `Last seen ${new Date(
+                                room.friend?.lastSeen,
+                              ).toLocaleDateString("en-IN", {
+                                day: "numeric",
+
+                                month: "short",
+                                hour: "numeric",
+                                minute: "2-digit",
+                              })}`}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Chat Button */}
+                    <button className="opacity-0 group-hover:opacity-100 transition-all">
+                      <MessageSquareText className="text-[#7736FB]" size={22} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
           ) : allUsers.length > 0 ? (
             allUsers.map((user, index) => (
               <div
@@ -411,10 +462,7 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
 
                   {/* Action Button with animation */}
                   {selectedFilter === "friends" && (
-                    <button
-                  
-                      className="absolute right-4 opacity-70 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0"
-                    >
+                    <button className="absolute right-4 opacity-70 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0">
                       <div
                         title={"Start Chat"}
                         className="text-red-500 p-3 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:scale-110"
@@ -427,9 +475,7 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
                   {selectedFilter !== "friends" && (
                     <button
                       onClick={
-                        !user?.isFriend
-                          ? () => handleAddFriend(user._id)
-                          :null
+                        !user?.isFriend ? () => handleAddFriend(user._id) : null
                       }
                       className="absolute right-4 opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0"
                     >
