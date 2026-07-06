@@ -76,9 +76,6 @@ const Chat = () => {
     roomId:chatRoomId
   }
 
-
-
-    
     try {
       const response = await GET(
         "messages/getMessages",

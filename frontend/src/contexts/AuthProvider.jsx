@@ -8,13 +8,17 @@ const AuthProvider = ({ children }) => {
     const availablUser=localStorage.getItem("userData");
     return availablUser ? JSON.parse(availablUser) : null;
   });
+  
+const [currentPartner,setCurrentPartner]=useState(()=>{
 
+  const availablePartner=localStorage.getItem("currentPartner")
+  return availablePartner?JSON.parse(availablePartner):{type:"public"}
+})
   
   const [roomType, setRoomType] = useState(() => {
     const availableRoomType = localStorage.getItem("roomType");
     return availableRoomType ? availableRoomType : "public";
   });
-
 
 
   const [chatRoomId,setChatRoomId]=useState(()=>{
@@ -34,6 +38,7 @@ return  localStorage.getItem("chatRoomId");
    },[userData]);
 
    const handleChatRoomIdChange = (newChatRoomId) => {
+    console.log("roomId change function")
     setChatRoomId(newChatRoomId);
      localStorage.setItem("chatRoomId", newChatRoomId)
   }
@@ -45,6 +50,13 @@ return  localStorage.getItem("chatRoomId");
     localStorage.removeItem("chatRoomId");
   }
 }, [chatRoomId]);
+
+
+const handlePartnerChange=(data)=>{
+setCurrentPartner(data)
+localStorage.setItem("currentPartner",JSON.stringify(data))
+
+}
 
 const handleRoomTypeChange = (newRoomType) => {
   
@@ -61,10 +73,11 @@ const handleRoomTypeChange = (newRoomType) => {
     setUserData(null);
     setChatRoomId(null);
     setRoomType(null);
+    localStorage.clear()
   };
 
   return (
-    <AuthContext.Provider value={{ userData, chatRoomId,roomType,setRoomType, login, logout,handleChatRoomIdChange }}>
+    <AuthContext.Provider value={{ userData, chatRoomId,roomType,setRoomType, login,handleRoomTypeChange, logout,handleChatRoomIdChange,handlePartnerChange,currentPartner }}>
       {children}
     </AuthContext.Provider>
   );

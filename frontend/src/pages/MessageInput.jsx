@@ -112,11 +112,12 @@ const MessageInput = ({ roomType, disabled = false }) => {
         senderName: userName,
         message: newMsg,
         attachments: uploadedFiles,
+        roomId:chatRoomId
       };
 
-      if (roomType === "public") {
-        messageData.roomId = chatRoomId;
-      }
+      // if (roomType === "public") {
+      //   messageData.roomId = chatRoomId;
+      // }
      console.log("message Data",messageData)
       socket.emit("sendMessage", messageData);
 

@@ -19,7 +19,7 @@ import { useAuth } from "../contexts/AuthProvider.jsx";
 import Modal from "../components/Modal.jsx";
 const ChatHeader = ({ handleShowOnlineUsers }) => {
   const { GET ,POST} = CustomApiService();
-  const { userData,login,logout } = useAuth();
+  const { userData,login,logout,roomType,currentPartner } = useAuth();
 
   const [openMenu, setOpenMenu] = useState(false);
   const [openProfile, setOpenProfile] = useState(false);
@@ -72,38 +72,26 @@ const navigate=useNavigate()
           </div>
 
           <div className="flex flex-col">
-            <div className="flex items-center gap-2">
-              <h1 className="text-[15px] font-bold text-gray-900 tracking-tight leading-none">
-               {"public Roommm"}
-              </h1>
-              {/* <span className="flex items-center gap-1 bg-gray-100 px-1.5 py-0.5 rounded-md border border-gray-200/50">
-                <Shield className="w-2.5 h-2.5 text-gray-500" />
-                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter">
-                  Public
-                </span>
-              </span> */}
-            </div>
-            {/* <div className="flex items-center gap-2 mt-1.5">
-              <div className="flex -space-x-1.5 overflow-hidden">
-                {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <div
-                    key={i}
-                    className="inline-block h-5 w-5 rounded-full ring-2  ring-white bg-gray-200"
-                  >
-                    <img
-                      src={`https://i.pravatar.cc/150?img=${i + 10}`}
-                      alt={`User ${i}`}
-                      className="h-full w-full object-cover rounded-full"
-                    />
-                  </div>
-                ))}
-              </div>
-              <p className="text-[11px] font-medium text-gray-400">
-                <span className="text-indigo-600 font-bold">12 active</span>{" "}
-                contributors
-              </p>
-            </div> */}
-          </div>
+  <h2 className="text-lg font-semibold text-gray-800">
+    {roomType === "public" ? "🌍 Public Room" : currentPartner?.name}
+  </h2>
+
+  <p
+    className={`text-sm ${
+      roomType === "public"
+        ? "text-gray-500"
+        : currentPartner?.isOnline
+        ? "text-green-500"
+        : "text-gray-500"
+    }`}
+  >
+    {roomType === "public"
+      ? "Open for everyone"
+      : currentPartner?.isOnline
+      ? "Online"
+      : `Last seen ${new Date(currentPartner?.lastSeen).toLocaleString()}`}
+  </p>
+</div>
         </div>
 
         {/* RIGHT: Global Actions */}

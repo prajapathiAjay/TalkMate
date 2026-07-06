@@ -30,12 +30,18 @@ import { toast } from "sonner";
 const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
   const { GET, POST } = CustomApiService();
   const [allUsers, setAllUsers] = useState([]);
-  const { userData, chatRoomId, handleChatRoomIdChange, handleRoomTypeChange } = useAuth();
+  const {
+    userData,
+    chatRoomId,
+    handleChatRoomIdChange,
+    handleRoomTypeChange,
+    handlePartnerChange,
+  } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
   const [isLoading, setIsLoading] = useState(false);
   const [friendRoom, setFriendRoom] = useState([]);
-  console.log("allUsers", allUsers);
+  console.log("friendRoom", friendRoom);
 
   const getAllUsers = async () => {
     try {
@@ -144,8 +150,12 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
 
       const response = await GET("room/private", params, {}, {});
       if (response.success) {
-        setFriendRoom(response?.data);
-        console.log("private room data", friendRoom);
+        setFriendRoom(
+          response?.data.map((friend) => ({
+            ...friend,
+            isCurrent: false,
+          })),
+        );
       }
     } catch (error) {}
   };
@@ -217,11 +227,28 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
     }
   };
 
-  const handleChatRoomChange=(roomId)=>{
-    handleChatRoomIdChange(roomId)
-    handleRoomTypeChange("private")
+  const handleChatRoomChange = (room) => {
+    handleChatRoomIdChange(room._id);
+    handleRoomTypeChange("private");
+    console.log("currentPartner", room);
+    handlePartnerChange(room?.friend);
+ setFriendRoom((prevFriends) =>
+  prevFriends.map((friend) => ({
+    ...friend,
+    isCurrent: friend._id ===room._id, // or friend._id === _id
+  }))
+);
+  };
 
-  }
+
+
+
+  const handlePublicChat = () => {
+    console.log("public room Id", userData);
+    handleRoomTypeChange("public");
+    handleChatRoomIdChange(userData?.user?.publicRoomId);
+    setSelectedFilter("public");
+  };
   const onlineCount = allUsers.filter((u) => u.isOnline === true);
   const awayCount = allUsers.filter((u) => u.isOnline === false);
   const offlineCount = allUsers.filter((u) => u.status === "offline");
@@ -231,18 +258,16 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
     .filter((u) => u.isFeatured || u.isOnline === true)
     .slice(0, 3);
 
+  const date = (date) => {
+    const newDate = new Date(date).toLocaleDateString("en-IN", {
+      day: "numeric",
 
-
-
-    const date=(date)=>{
-      const newDate=new Date(date).toLocaleDateString("en-IN",{day: "numeric",
-
-                                month: "short",
-                                hour: "numeric",
-                                minute: "2-digit",})
-                                return newDate
-
-    }
+      month: "short",
+      hour: "numeric",
+      minute: "2-digit",
+    });
+    return newDate;
+  };
 
   return (
     <div
@@ -289,9 +314,9 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
           >
             <Wifi className="w-4 h-4 mr-2" /> Online
           </button>
-            <button
-            onClick={() => setSelectedFilter(true)}
-            className={`flex cursor-pointer px-4 py-2 items-center rounded-xl ${selectedFilter === true ? "bg-[#7736FB] border border-[#7736FB]/30 text-white" : "bg-white/20 border border-[#7736FB]/30 text-[#7736FB]"} font-semibold shadow-lg hover:bg-[#7736FB]/30 hover:scale-105 transition-all duration-300`}
+          <button
+            onClick={() => handlePublicChat()}
+            className={`flex cursor-pointer px-4 py-2 items-center rounded-xl ${selectedFilter === "public" ? "bg-[#7736FB] border border-[#7736FB]/30 text-white" : "bg-white/20 border border-[#7736FB]/30 text-[#7736FB]"} font-semibold shadow-lg hover:bg-[#7736FB]/30 hover:scale-105 transition-all duration-300`}
           >
             <Wifi className="w-4 h-4 mr-2" /> Public Chat
           </button>
@@ -357,8 +382,8 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
               {friendRoom.map((room) => (
                 <div
                   key={room._id}
-                  onClick={() => handleChatRoomChange(room._id)}
-                  className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:border-purple-200 cursor-pointer transition-all duration-300 p-4"
+                  onClick={() => handleChatRoomChange(room)}
+                  className={`group ${room.isCurrent===false?"bg-white":"bg-gray-300"} rounded-2xl border  border-gray-100 shadow-sm hover:shadow-lg hover:border-purple-200 cursor-pointer transition-all duration-300 p-4`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
@@ -393,9 +418,8 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
                           {room.friend?.isOnline
                             ? "Online"
                             : `Last seen ${date(room?.friend?.lastSeen)}`}
-                            
-                            
-{/*                             
+
+                          {/*                             
                             `Last seen ${new Date(
                                 room.friend?.lastSeen,
                               ).toLocaleDateString("en-IN", {
