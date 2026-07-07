@@ -72,7 +72,7 @@ export const handleOnlineUsers = async (socket) => {
 
          }
          
-            socket.broadcast.emit("user-status-changed", message);
+            socket.broadcast.emit("user-status-changed",  response);
       }
 
    } catch (error) {
