@@ -26,12 +26,7 @@ export const socketLogic = (server) => {
   // });
 
     console.log("socket connected")
-    try {
-      // await handleOnlineUsers(socket)
-    } catch (error) {
-      console.log(error)
-    }
-
+ 
     // typing indicator
     // on Typing
     socket.on("typing", ({ name, roomId, userId }) => {
@@ -43,31 +38,39 @@ export const socketLogic = (server) => {
       socket.broadcast.to(roomId).emit("userStopTyping", { userId, name })
     })
 
-    socket.on("join-room", async ({ roomId, userName }, ack) => {
+    socket.on("join-room", async ({ roomId, userName,roomType }, ack) => {
       socket.roomId = roomId;
       socket.userName = userName;
+      socket.roomType
       console.log("roomid", roomId, userName)
       socket.join(roomId);
-      try {
-        const messageData = { roomId, message: `${userName} has joined the Chat`, messageType: "join" }
-        const message = await createMessageRepository(messageData)
-        // console.log("messagessdasdasd", message)
+         try {
+      await handleOnlineUsers(socket)
+    } catch (error) {
+      console.log(error)
+    }
 
-        if (message?.success) {
-          ack?.({
-            message
-          })
-        }
-      } catch (error) {
-        ack?.({
-          success: false,
-          message: "failed to join room",
-          error: error?.message,
-        })
-      }
+      // try {
+      //   const messageData = { roomId, message: `${userName} has joined the Chat`, messageType: "join" }
+      //   const message = await createMessageRepository(messageData)
+      //   // console.log("messagessdasdasd", message)
+
+      //   if (message?.success) {
+      //     ack?.({
+      //       message
+      //     })
+      //   }
+      // } catch (error) {
+      //   ack?.({
+      //     success: false,
+      //     message: "failed to join room",
+      //     error: error?.message,
+      //   })
+      // }
       // socket.emit("joinSuccess", { userName });
       // socket.to(roomId).emit("userJoined", message);
     });
+    
 
     socket.on("sendMessage", async ({ message, senderName, attachments,roomId,senderId }, ack) => {
       // const { roomId, userName } = socket

@@ -7,7 +7,7 @@
 
 
 import { handleOnlineUsersrepo } from "../features/user/user.reposotory.js";
-
+import { createMessageRepository } from "../features/message/message.repository.js";
 const onlineUsers = new Map();
 const disconnectTimers = new Map();
 
@@ -37,16 +37,44 @@ export const handleOnlineUsers = async (socket) => {
 
       onlineUsers.get(userId).add(socket.id);
 
+      // if (isFirstConnection) {
+      //    const response = await handleOnlineUsersrepo(true, userId);
+
+
+      //    if (response.success) {
+      //       console.log("EMITTING user-status-changed", response);
+      //       socket.broadcast.emit("user-status-changed", response);
+      //    }
+
+      //    console.log("connectresponse", response);
+      // }
       if (isFirstConnection) {
          const response = await handleOnlineUsersrepo(true, userId);
 
-         if (response.success) {
-            console.log("EMITTING user-status-changed", response);
-            socket.broadcast.emit("user-status-changed", response);
-         }
+         if (response.success && socket.roomType !== "private") {
+            const publicRoomId = response.publicRoomId; // Return this from your repository
 
-         console.log("connectresponse", response);
+            const userName = response.data.name;
+
+            const message = await createMessageRepository({
+               roomId: socket.roomId,
+               message: `${userName} has joined the chat`,
+               messageType: "join",
+            });
+
+            if (message.success) {
+               socket.broadcast
+                   .to(publicRoomId)
+                   .emit("message", message);
+          
+               console.log("messahiim", message)
+            }
+
+         }
+         
+            socket.broadcast.emit("user-status-changed", message);
       }
+
    } catch (error) {
       console.error("Error in handleOnlineUsers:", error);
    }
