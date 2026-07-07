@@ -33,6 +33,7 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
   const {
     userData,
     chatRoomId,
+    roomType,
     handleChatRoomIdChange,
     handleRoomTypeChange,
     handlePartnerChange,
@@ -452,7 +453,7 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
                   {/* Avatar with fancy ring */}
                   <div className="relative">
                     <div
-                      className={`absolute inset-0 ${getStatusColor(user.isOnline)} rounded-2xl blur opacity-50 group-hover:opacity-70 transition-opacity`}
+                      className={`absolute inset-0 ${getStatusColor(user.isOnline)} rounded-2xl  opacity-50 group-hover:opacity-70 transition-opacity`}
                     ></div>
                     {user.avatar ? (
                       <img

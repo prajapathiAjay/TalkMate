@@ -54,7 +54,7 @@ const Chat = () => {
   };
 
   const handleJoinRoom = (res) => {
- 
+      console.log("handleJoin",res)
     if (res?.message?.success) {
     console.log("handle join trigger",res?.message?.data)
           //  toast.success(`${res?.message?.data?.message}`);
@@ -174,6 +174,7 @@ useEffect(() => {
       {
        roomId: chatRoomId,
         userName,
+        roomType  
       },
       handleJoinRoom
     );
