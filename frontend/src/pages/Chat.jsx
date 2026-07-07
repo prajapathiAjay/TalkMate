@@ -64,6 +64,7 @@ const Chat = () => {
     }
   };
   const handleMessage = (message) => {
+    
     console.log("handle message invoked", message);
     if (message?.success) {
       console.log("Received message from server:", message.data);
@@ -175,8 +176,8 @@ useEffect(() => {
        roomId: chatRoomId,
         userName,
         roomType  
-      },
-      handleJoinRoom
+      }
+      // handleJoinRoom
     );
   };
 

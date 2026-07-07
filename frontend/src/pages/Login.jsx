@@ -670,11 +670,7 @@ const Login = () => {
   if(response.success){
       localStorage.setItem("token",response.token)
     login(response.data);
-   
-socket.auth = {
-  token:response.token,
-};
-socket.connect();
+  
   
       navigate("/chat")
     toast.success(response.message || (type === "login" ? "Logged in successfully!" : "Account created successfully!"));

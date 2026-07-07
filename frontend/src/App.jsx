@@ -10,6 +10,9 @@ function App() {
 
 useEffect(() => {
   if (userData && !socket.connected) {
+    socket.auth = {
+  token:localStorage.getItem("token"),
+};
     socket.connect();
   }
 
