@@ -27,14 +27,14 @@ export const roomCreationRepo = async (roomData) => {
 
 
         if (existingRoom) {
-    return {
-        success: false,
-        error: {
-            statusCode: 400,
-            message: "Room already exists for chat"
+            return {
+                success: false,
+                error: {
+                    statusCode: 400,
+                    message: "Room already exists for chat"
+                }
+            };
         }
-    };
-}
 
 
 
@@ -113,7 +113,7 @@ export const getRoomDataRepo = async (data) => {
 
 
     } catch (error) {
-          return {
+        return {
             success: false,
             error: {
                 statusCode: 500,
@@ -137,67 +137,75 @@ export const getRoomDataRepo = async (data) => {
 
 
 
-export const roomDatawithseenRepo=async(data,Id)=>{
- const myId=new mongoose.Types.ObjectId(Id)
- 
+export const roomDatawithseenRepo = async (name="", Id) => {
 
-try {
-    
-const response = await RoomModel.aggregate([
-    
-  {
-    $match: {
-      type: "private",
-      participants: myId
-    }
-  },
-  {
-    $lookup: {
-      from: "users",
-      let: {
-        participants: "$participants"
-      },
-      pipeline: [
-        {
-          $match: {
-            $expr: {
-              $and: [
-                { $in: ["$_id", "$$participants"] }, // User is in participants
-                { $ne: ["$_id", myId] }              // User is NOT me
-              ]
+console.log("room name",name)
+
+    const myId = new mongoose.Types.ObjectId(Id)
+
+
+    try {
+
+        const response = await RoomModel.aggregate([
+
+            {
+                $match: {
+                    type: "private",
+                    participants: myId
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    let: {
+                        participants: "$participants"
+                    },
+                    pipeline: [
+                       
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $in: ["$_id", "$$participants"] },
+                                        { $ne: ["$_id", myId] }
+                                    ]
+                                },
+                                name: {
+                                    $regex: `^${name.trim()}`,
+                                    $options: "i"
+                                }
+                            }
+                        },
+                        {
+                            $project: {
+                                password: 0
+                            }
+                        }
+                    ],
+                    as: "friend"
+                }
+            },
+            {
+                $unwind: "$friend"
             }
-          }
-        },
-        {
-          $project: {
-            password: 0
-          }
+        ]);
+
+        return {
+            success: true,
+            status: 200,
+            message: "private room dat fetched Successfully",
+            data: response
         }
-      ],
-      as: "friend"
+
+
+        console.log("response", response)
+
+
+
+    } catch (error) {
+        console.log("error", error)
+
     }
-  },
-  {
-    $unwind: "$friend"
-  }
-]);
-
-return{
-    success:true,
-    status:200,
-    message:"private room dat fetched Successfully",
-    data:response
-}
-
-
-console.log("response",response)
-
-
-
-} catch (error) {
-    console.log("error",error)
-    
-}
 
 
 

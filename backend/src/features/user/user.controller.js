@@ -145,9 +145,9 @@ export const getAllUsers = async (req, res, next) => {
 
   try {
     console.log("request query", req.query)
-    const { isOnline } = req.query
+    const { isOnline,name } = req.query
 
-    const allUsers = await getAllUsersRepo(req?.user?.id, isOnline)
+    const allUsers = await getAllUsersRepo(req?.user?.id, isOnline,name)
 
     if (allUsers.success) {
       return res.status(200).json({

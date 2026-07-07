@@ -44,13 +44,18 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
   const [friendRoom, setFriendRoom] = useState([]);
   console.log("friendRoom", friendRoom);
 
+  // search functionality
+
+
   const getAllUsers = async () => {
     try {
       const params = {};
       if (selectedFilter !== "all") {
         params.isOnline = selectedFilter;
       }
-
+    if(searchTerm.trim()!==""){
+       params.name=searchTerm
+      }
       setIsLoading(true);
       const res = await GET("user/allUsers", params, {}, {});
       if (res?.success) {
@@ -145,9 +150,13 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
   const getPrivateRoom = async () => {
     try {
       const params = {
+  
         type: "private",
         participants: [userData?.user?.userId],
       };
+      if(searchTerm.trim()!==""){
+       params.name=searchTerm
+      }
 
       const response = await GET("room/private", params, {}, {});
       if (response.success) {
@@ -165,24 +174,19 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
     socket.on("user-status-changed", handleStatusChange);
   }, []);
 
-  useEffect(() => {
+useEffect(() => {
+  if (selectedFilter === "public") return;
+
+  const timer = setTimeout(() => {
     if (selectedFilter === "friends") {
       getPrivateRoom();
     } else {
       getAllUsers();
     }
-  }, [selectedFilter]);
+  }, 1000);
 
-  const filteredUsers = allUsers.filter((user) => {
-    const matchesSearch =
-      user?.name ||
-      user?.friendId?.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter =
-      selectedFilter === "all" ||
-      selectedFilter === "friends" ||
-      user?.isOnline === selectedFilter;
-    return matchesSearch && matchesFilter;
-  });
+  return () => clearTimeout(timer);
+}, [searchTerm, selectedFilter]);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -233,16 +237,13 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
     handleRoomTypeChange("private");
     console.log("currentPartner", room);
     handlePartnerChange(room?.friend);
- setFriendRoom((prevFriends) =>
-  prevFriends.map((friend) => ({
-    ...friend,
-    isCurrent: friend._id ===room._id, // or friend._id === _id
-  }))
-);
+    setFriendRoom((prevFriends) =>
+      prevFriends.map((friend) => ({
+        ...friend,
+        isCurrent: friend._id === room._id, // or friend._id === _id
+      })),
+    );
   };
-
-
-
 
   const handlePublicChat = () => {
     console.log("public room Id", userData);
@@ -308,7 +309,7 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
           >
             <Handshake className="w-4 h-4 mr-2" /> Friends
           </button>
- <button
+          <button
             onClick={() => handlePublicChat()}
             className={`flex text-sm cursor-pointer px-4 py-2 items-center rounded-xl ${selectedFilter === "public" ? "bg-[#7736FB] border border-[#7736FB]/30 text-white" : "bg-white/20 border border-[#7736FB]/30 text-[#7736FB]"} font-semibold shadow-lg hover:bg-[#7736FB]/30 hover:scale-105 transition-all duration-300`}
           >
@@ -384,7 +385,7 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
                 <div
                   key={room._id}
                   onClick={() => handleChatRoomChange(room)}
-                  className={`group ${room.isCurrent===false?"bg-white":"bg-gray-300"} rounded-2xl border  border-gray-100 shadow-sm hover:shadow-lg hover:border-purple-200 cursor-pointer transition-all duration-300 p-4`}
+                  className={`group ${room.isCurrent === false ? "bg-white" : "bg-gray-300"} rounded-2xl border  border-gray-100 shadow-sm hover:shadow-lg hover:border-purple-200 cursor-pointer transition-all duration-300 p-4`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
@@ -606,9 +607,7 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
             </div>
           </div>
           <div className="flex items-center gap-1 text-sm">
-            <span className="font-bold text-blue-600">
-              {filteredUsers.length}
-            </span>
+            <span className="font-bold text-blue-600">{allUsers.length}</span>
             <span className="text-gray-400">/ {allUsers.length}</span>
             <ChevronRight className="w-4 h-4 text-gray-400" />
           </div>

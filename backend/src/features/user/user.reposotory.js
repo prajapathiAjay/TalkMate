@@ -106,13 +106,20 @@ export const userSignInRepo = async (data) => {
 }
 
 
-export const getAllUsersRepo = async (id, isOnline) => {
-
+export const getAllUsersRepo = async (id, isOnline,name="") => {
+    
+      
     try {
         const filter = {};
 
         if (isOnline !== undefined) {
             filter.isOnline = isOnline === "true";
+        }
+          if (name?.trim()) {
+            filter.name = {
+                $regex: `^${name}`, // Starts with the entered text
+                $options: "i"
+            };
         }
         const getAllUser = await UserModel.find(filter).select("-password")
 

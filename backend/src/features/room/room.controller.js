@@ -95,10 +95,11 @@ export const getRoomData = async (req, res, next) => {
 
 
 export const roomDatawithseen = async (req, res, next) => {
-    const data = req.params
+    const {name} = req.query
+    console.log("controller name",name)
 
     try {
-        const response = await roomDatawithseenRepo(data, req?.user?.id)
+        const response = await roomDatawithseenRepo(name, req?.user?.id)
         if (response?.success) {
             return res.status(response?.status).json({
 
