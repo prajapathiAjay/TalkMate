@@ -295,7 +295,7 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
         <div className="flex flex-wrap items-between justify-evenly gap-y-2 ">
           <button
             onClick={() => setSelectedFilter("all")}
-            className={`flex cursor-pointer px-4 py-2 items-center rounded-xl ${selectedFilter === "all" ? "bg-[#7736FB] border border-[#7736FB]/30 text-white" : "bg-white/20 border border-[#7736FB]/30 text-[#7736FB]"} font-semibold shadow-lg hover:bg-[#7736FB]/30 hover:scale-105 transition-all duration-300`}
+            className={`flex text-sm cursor-pointer px-4 py-2 items-center rounded-xl ${selectedFilter === "all" ? "bg-[#7736FB] border border-[#7736FB]/30 text-white" : "bg-white/20 border border-[#7736FB]/30 text-[#7736FB]"} font-semibold shadow-lg hover:bg-[#7736FB]/30 hover:scale-105 transition-all duration-300`}
           >
             <Users2Icon className="w-4 h-4 mr-2" /> All Users
           </button>
@@ -304,30 +304,30 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
               setSelectedFilter("friends");
               // getAllFriends();
             }}
-            className={`flex cursor-pointer px-4 py-2 items-center rounded-xl ${selectedFilter === "friends" ? "bg-[#7736FB] border border-[#7736FB]/30 text-white" : "bg-white/20 border border-[#7736FB]/30 text-[#7736FB]"} font-semibold shadow-lg hover:bg-[#7736FB]/30 hover:scale-105 transition-all duration-300`}
+            className={`flex text-sm cursor-pointer px-4 py-2 items-center rounded-xl ${selectedFilter === "friends" ? "bg-[#7736FB] border border-[#7736FB]/30 text-white" : "bg-white/20 border border-[#7736FB]/30 text-[#7736FB]"} font-semibold shadow-lg hover:bg-[#7736FB]/30 hover:scale-105 transition-all duration-300`}
           >
             <Handshake className="w-4 h-4 mr-2" /> Friends
           </button>
-
-          <button
-            onClick={() => setSelectedFilter(true)}
-            className={`flex cursor-pointer px-4 py-2 items-center rounded-xl ${selectedFilter === true ? "bg-[#7736FB] border border-[#7736FB]/30 text-white" : "bg-white/20 border border-[#7736FB]/30 text-[#7736FB]"} font-semibold shadow-lg hover:bg-[#7736FB]/30 hover:scale-105 transition-all duration-300`}
-          >
-            <Wifi className="w-4 h-4 mr-2" /> Online
-          </button>
-          <button
+ <button
             onClick={() => handlePublicChat()}
-            className={`flex cursor-pointer px-4 py-2 items-center rounded-xl ${selectedFilter === "public" ? "bg-[#7736FB] border border-[#7736FB]/30 text-white" : "bg-white/20 border border-[#7736FB]/30 text-[#7736FB]"} font-semibold shadow-lg hover:bg-[#7736FB]/30 hover:scale-105 transition-all duration-300`}
+            className={`flex text-sm cursor-pointer px-4 py-2 items-center rounded-xl ${selectedFilter === "public" ? "bg-[#7736FB] border border-[#7736FB]/30 text-white" : "bg-white/20 border border-[#7736FB]/30 text-[#7736FB]"} font-semibold shadow-lg hover:bg-[#7736FB]/30 hover:scale-105 transition-all duration-300`}
           >
             <Wifi className="w-4 h-4 mr-2" /> Public Chat
           </button>
+          {/* <button
+            onClick={() => setSelectedFilter(true)}
+            className={`flex text-sm cursor-pointer px-4 py-2 items-center rounded-xl ${selectedFilter === true ? "bg-[#7736FB] border border-[#7736FB]/30 text-white" : "bg-white/20 border border-[#7736FB]/30 text-[#7736FB]"} font-semibold shadow-lg hover:bg-[#7736FB]/30 hover:scale-105 transition-all duration-300`}
+          >
+            <Wifi className="w-4 h-4 mr-2" /> Online
+          </button>
+         
 
           <button
             onClick={() => setSelectedFilter(false)}
-            className={`flex cursor-pointer px-4 py-2 items-center rounded-xl ${selectedFilter === false ? "bg-[#7736FB] border border-[#7736FB]/30 text-white" : "bg-white/20 border border-[#7736FB]/30 text-[#7736FB]"} font-semibold shadow-lg hover:bg-[#7736FB]/30 hover:scale-105 transition-all duration-300`}
+            className={`flex text-sm cursor-pointer px-4 py-2 items-center rounded-xl ${selectedFilter === false ? "bg-[#7736FB] border border-[#7736FB]/30 text-white" : "bg-white/20 border border-[#7736FB]/30 text-[#7736FB]"} font-semibold shadow-lg hover:bg-[#7736FB]/30 hover:scale-105 transition-all duration-300`}
           >
             <WifiOff className="w-4 h-4 mr-2" /> Offline
-          </button>
+          </button> */}
 
           {/* <button className={`cursor-pointer px-4 py-2 rounded-xl ${selectedFilter === "groups" ? "bg-[#7736FB]/20 border border-[#7736FB]/30 text-white" : "bg-white/20 border border-white/30 text-[#7736FB]"} font-semibold shadow-lg hover:bg-[#7736FB]/30 hover:scale-105 transition-all duration-300`}>
             👨‍👩‍👧 Groups
@@ -336,15 +336,15 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
       </div>
 
       {/* Search Section */}
-      <div className="p-5">
+      <div className="py-2 px-3 bg-[#7736FB]/20 rounded-b-2xl">
         <div className="relative group">
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 group-focus-within:text-blue-500 transition-colors" />
+          {/* <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 group-focus-within:text-blue-500 transition-colors" /> */}
           <input
             type="text"
             placeholder="Search amazing people..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-white border-2 border-gray-100 text-gray-800 placeholder-gray-400 rounded-2xl pl-10 pr-12 py-3.5 focus:outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100 transition-all shadow-sm"
+            className="w-full bg-white border-2 border-gray-100 text-gray-800 placeholder-gray-400 rounded-2xl px-3 text-xs  py-2 focus:outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100 transition-all shadow-sm"
           />
           {searchTerm && (
             <button

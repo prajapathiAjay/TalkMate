@@ -263,7 +263,7 @@ useEffect(() => {
             setIsAtBottom(scrollHeight - scrollTop <= clientHeight + 50);
           }}
         >
-          <div className="max-w-4xl mx-auto">
+          <div className="w-full lg:max-w-4xl mx-auto">
             {messages.length === 0 ? (
               <div className="h-full flex items-center justify-center">
                 <div className="text-center text-gray-400">

@@ -86,7 +86,7 @@ const MessageItem = ({ msg, currentUser, prevMessage }) => {
   if (isJoinMessage) {
     return (
       <div className="flex justify-center my-2">
-        <div className="text-blue-700 px-4 py-2 rounded-full text-sm font-normal border border-blue-200">
+        <div className="text-gray-600 px-4 py-1 rounded-full text-xs font-normal ">
           {msg?.message}
         </div>
       </div>
@@ -185,8 +185,8 @@ const MessageItem = ({ msg, currentUser, prevMessage }) => {
 
   return (
     <>
-      <div className={`flex ${isCurrentUser ? "justify-end" : "justify-start"} mb-1 px-4`}>
-        <div className={`flex ${isCurrentUser ? "flex-row-reverse" : "flex-row"} max-w-[70%]`}>
+      <div className={`flex ${isCurrentUser ? "justify-end" : "justify-start"} mb-1 `}>
+        <div className={`flex ${isCurrentUser ? "flex-row-reverse" : "flex-row"} max-w-[90%] md:max-w-[80%]`}>
           {!isCurrentUser && !isSameSenderAsPrev && (
             <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white text-sm font-bold mr-2 flex-shrink-0">
               {msg?.senderName?.charAt(0)?.toUpperCase() || "U"}
