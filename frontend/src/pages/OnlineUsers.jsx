@@ -443,7 +443,7 @@ useEffect(() => {
                 </div>
               ))}
             </div>
-          ) : allUsers.length > 0 ? (
+          ) :selectedFilter==="all" && allUsers.length > 0 ? (
             allUsers.map((user, index) => (
               <div
                 key={user.id || index}
