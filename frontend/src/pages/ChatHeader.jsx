@@ -10,15 +10,18 @@ import {
   MoreHorizontal,
   Bell,
   Search,
+  ArrowLeftRightIcon,
+  LucideContact2,
   ChevronDown,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { FormatLastSeen } from "../utilityFuntions/FormatLastSeen.js";
 import CustomApiService from "../services/CustomApiService";
 import { useAuth } from "../contexts/AuthProvider.jsx";
 import Modal from "../components/Modal.jsx";
 const ChatHeader = ({ handleShowOnlineUsers }) => {
   const { GET, POST } = CustomApiService();
-  const { userData, login, logout, roomType, currentPartner } = useAuth();
+  const { userData, login, logout, roomType, currentPartner ,handleRoomTypeChange,handleChatRoomIdChange} = useAuth();
 
   const [openMenu, setOpenMenu] = useState(false);
   const [openProfile, setOpenProfile] = useState(false);
@@ -53,7 +56,12 @@ const ChatHeader = ({ handleShowOnlineUsers }) => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
+  const switchPublicRoom = () => {
+    console.log("public room Id", userData);
+    handleRoomTypeChange("public");
+    handleChatRoomIdChange(userData?.user?.publicRoomId);
+  
+  };
   return (
     <>
       <header className="sticky top-0  w-full px-4 pt-4 pb-2 bg-transparent pointer-events-none">
@@ -94,7 +102,7 @@ const ChatHeader = ({ handleShowOnlineUsers }) => {
                   ? "Open for everyone"
                   : currentPartner?.isOnline
                     ? "Online"
-                    : `Last seen ${new Date(currentPartner?.lastSeen).toLocaleString()}`}
+                    : `${FormatLastSeen(currentPartner?.lastSeen)}`}
               </p>
             </div>
           </div>
@@ -102,31 +110,31 @@ const ChatHeader = ({ handleShowOnlineUsers }) => {
           {/* RIGHT: Global Actions */}
           <div className="flex items-center gap-1.5">
             {/* Secondary Action: Search */}
-            <button
-              onClick={() => {
-                toast.info("Search functionality coming soon!");
-              }}
-              className="hidden sm:flex p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-xl transition-colors"
-            >
-              <Search className="w-4.5 h-4.5" />
-            </button>
+            
 
             {/* Secondary Action: Notifications */}
             {/* <button className="hidden sm:flex p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-xl transition-colors">
             <Bell className="w-4.5 h-4.5" />
           </button> */}
 
-            <div className="h-4 w-[1px] bg-gray-200 mx-1 hidden sm:block" />
+            {/* <div className="h-4 w-[1px] bg-gray-200 mx-1 hidden sm:block" /> */}
 
             {/* Mobile Users Toggle */}
+             <button
+              onClick={switchPublicRoom}
+              className={`${roomType==="public"?"hidden":"visible"} flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-xl transition-all shadow-md shadow-indigo-100 active:scale-95`}
+            >
+              <ArrowLeftRightIcon className="w-4 h-4 " />
+              <span className="text-xs font-bold">public chat</span>
+            </button>
             <button
               onClick={handleShowOnlineUsers}
               className="md:hidden flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-xl transition-all shadow-md shadow-indigo-100 active:scale-95"
             >
-              <Users className="w-4 h-4" />
-              <span className="text-xs font-bold">Members</span>
+              <LucideContact2 className="w-4 h-4" />
+              <span className="text-xs font-bold">Users</span>
             </button>
-
+          
             {/* User Menu */}
             <div className="relative" ref={menuRef}>
               <button

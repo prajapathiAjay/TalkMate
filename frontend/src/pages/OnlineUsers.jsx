@@ -22,6 +22,7 @@ import {
   MessageSquareText,
   Handshake,
 } from "lucide-react";
+import { FormatLastSeen } from "../utilityFuntions/FormatLastSeen.js";
 import CustomApiService from "../services/CustomApiService";
 import socket from "../Socket.jsx";
 import { useAuth } from "../contexts/AuthProvider.jsx";
@@ -37,6 +38,9 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
     handleChatRoomIdChange,
     handleRoomTypeChange,
     handlePartnerChange,
+    // friendRoom,
+    // handleFriendRoom
+
   } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
@@ -46,15 +50,14 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
 
   // search functionality
 
-
   const getAllUsers = async () => {
     try {
       const params = {};
       if (selectedFilter !== "all") {
         params.isOnline = selectedFilter;
       }
-    if(searchTerm.trim()!==""){
-       params.name=searchTerm
+      if (searchTerm.trim() !== "") {
+        params.name = searchTerm;
       }
       setIsLoading(true);
       const res = await GET("user/allUsers", params, {}, {});
@@ -130,6 +133,10 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
         toast.success(friendResponse.message);
         console.log("Friend added successfully", friendResponse);
       }
+
+      if (roomResponse && friendResponse) {
+        getAllUsers();
+      }
     } catch (error) {
       console.error("Error:", error);
     }
@@ -150,12 +157,11 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
   const getPrivateRoom = async () => {
     try {
       const params = {
-  
         type: "private",
         participants: [userData?.user?.userId],
       };
-      if(searchTerm.trim()!==""){
-       params.name=searchTerm
+      if (searchTerm.trim() !== "") {
+        params.name = searchTerm;
       }
 
       const response = await GET("room/private", params, {}, {});
@@ -174,19 +180,42 @@ const OnlineUsers = ({ showOnlineUsers, handleShowOnlineUsers }) => {
     socket.on("user-status-changed", handleStatusChange);
   }, []);
 
-useEffect(() => {
-  if (selectedFilter === "public") return;
+  useEffect(() => {
+    if (roomType === "private") {
+      return;
+    }
+    handleRoomTypeChange("public");
+    handleChatRoomIdChange(userData?.user?.publicRoomId);
 
-  const timer = setTimeout(() => {
+    // Remove active friend selection
+    setFriendRoom((prev) =>
+      prev.map((friend) => ({
+        ...friend,
+        isCurrent: false,
+      })),
+    );
+    handlePartnerChange(null);
+  }, [roomType]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (selectedFilter === "friends") {
+        getPrivateRoom();
+      } else {
+        getAllUsers();
+      }
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  useEffect(() => {
     if (selectedFilter === "friends") {
       getPrivateRoom();
     } else {
       getAllUsers();
     }
-  }, 1000);
-
-  return () => clearTimeout(timer);
-}, [searchTerm, selectedFilter]);
+  }, [selectedFilter]);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -245,12 +274,6 @@ useEffect(() => {
     );
   };
 
-  const handlePublicChat = () => {
-    console.log("public room Id", userData);
-    handleRoomTypeChange("public");
-    handleChatRoomIdChange(userData?.user?.publicRoomId);
-    setSelectedFilter("public");
-  };
   const onlineCount = allUsers.filter((u) => u.isOnline === true);
   const awayCount = allUsers.filter((u) => u.isOnline === false);
   const offlineCount = allUsers.filter((u) => u.status === "offline");
@@ -259,17 +282,6 @@ useEffect(() => {
   const featuredUsers = allUsers
     .filter((u) => u.isFeatured || u.isOnline === true)
     .slice(0, 3);
-
-  const date = (date) => {
-    const newDate = new Date(date).toLocaleDateString("en-IN", {
-      day: "numeric",
-
-      month: "short",
-      hour: "numeric",
-      minute: "2-digit",
-    });
-    return newDate;
-  };
 
   return (
     <div
@@ -285,55 +297,39 @@ useEffect(() => {
       `}
     >
       {/* Header with Gradient */}
-      <div className="flex items-center  border-5 border-indigo-200 px-2 py-1 relative overflow-hidden">
+      <div className="flex items-center   border-5 border-indigo-200 px-2 py-1 relative overflow-hidden">
         <div
           onClick={handleShowOnlineUsers}
           className="block md:hidden flex items-center h-full w-8 text-[#7736FB]  rounded-lg bg-white border-2 border-indigo-200 hover:bg-indigo-50 cursor-pointer justify-center mr-3"
         >
-          <ChevronLeft className="w-5 h-20 " />
+          <ChevronLeft className="w-5 h-4 " />
         </div>
 
-        <div className="flex flex-wrap items-between justify-evenly gap-y-2 ">
-          <button
-            onClick={() => setSelectedFilter("all")}
-            className={`flex text-sm cursor-pointer px-4 py-2 items-center rounded-xl ${selectedFilter === "all" ? "bg-[#7736FB] border border-[#7736FB]/30 text-white" : "bg-white/20 border border-[#7736FB]/30 text-[#7736FB]"} font-semibold shadow-lg hover:bg-[#7736FB]/30 hover:scale-105 transition-all duration-300`}
-          >
-            <Users2Icon className="w-4 h-4 mr-2" /> All Users
-          </button>
-          <button
-            onClick={() => {
-              setSelectedFilter("friends");
-              // getAllFriends();
-            }}
-            className={`flex text-sm cursor-pointer px-4 py-2 items-center rounded-xl ${selectedFilter === "friends" ? "bg-[#7736FB] border border-[#7736FB]/30 text-white" : "bg-white/20 border border-[#7736FB]/30 text-[#7736FB]"} font-semibold shadow-lg hover:bg-[#7736FB]/30 hover:scale-105 transition-all duration-300`}
-          >
-            <Handshake className="w-4 h-4 mr-2" /> Friends
-          </button>
-          <button
-            onClick={() => handlePublicChat()}
-            className={`flex text-sm cursor-pointer px-4 py-2 items-center rounded-xl ${selectedFilter === "public" ? "bg-[#7736FB] border border-[#7736FB]/30 text-white" : "bg-white/20 border border-[#7736FB]/30 text-[#7736FB]"} font-semibold shadow-lg hover:bg-[#7736FB]/30 hover:scale-105 transition-all duration-300`}
-          >
-            <Wifi className="w-4 h-4 mr-2" /> Public Chat
-          </button>
-          {/* <button
-            onClick={() => setSelectedFilter(true)}
-            className={`flex text-sm cursor-pointer px-4 py-2 items-center rounded-xl ${selectedFilter === true ? "bg-[#7736FB] border border-[#7736FB]/30 text-white" : "bg-white/20 border border-[#7736FB]/30 text-[#7736FB]"} font-semibold shadow-lg hover:bg-[#7736FB]/30 hover:scale-105 transition-all duration-300`}
-          >
-            <Wifi className="w-4 h-4 mr-2" /> Online
-          </button>
-         
+        <div className="flex w-full justify-between gap-3">
+  <button
+    onClick={() => setSelectedFilter("all")}
+    className={`flex-1 flex items-center justify-center text-sm cursor-pointer px-4 py-2 rounded-xl ${
+      selectedFilter === "all"
+        ? "bg-[#7736FB] border border-[#7736FB]/30 text-white"
+        : "bg-white/20 border border-[#7736FB]/30 text-[#7736FB]"
+    } font-semibold shadow-lg hover:bg-[#7736FB]/30 hover:scale-105 transition-all duration-300`}
+  >
+    <Users2Icon className="w-4 h-4 mr-2" />
+    All Users
+  </button>
 
-          <button
-            onClick={() => setSelectedFilter(false)}
-            className={`flex text-sm cursor-pointer px-4 py-2 items-center rounded-xl ${selectedFilter === false ? "bg-[#7736FB] border border-[#7736FB]/30 text-white" : "bg-white/20 border border-[#7736FB]/30 text-[#7736FB]"} font-semibold shadow-lg hover:bg-[#7736FB]/30 hover:scale-105 transition-all duration-300`}
-          >
-            <WifiOff className="w-4 h-4 mr-2" /> Offline
-          </button> */}
-
-          {/* <button className={`cursor-pointer px-4 py-2 rounded-xl ${selectedFilter === "groups" ? "bg-[#7736FB]/20 border border-[#7736FB]/30 text-white" : "bg-white/20 border border-white/30 text-[#7736FB]"} font-semibold shadow-lg hover:bg-[#7736FB]/30 hover:scale-105 transition-all duration-300`}>
-            👨‍👩‍👧 Groups
-          </button> */}
-        </div>
+  <button
+    onClick={() => setSelectedFilter("friends")}
+    className={`flex-1 flex items-center justify-center text-sm cursor-pointer px-4 py-2 rounded-xl ${
+      selectedFilter === "friends"
+        ? "bg-[#7736FB] border border-[#7736FB]/30 text-white"
+        : "bg-white/20 border border-[#7736FB]/30 text-[#7736FB]"
+    } font-semibold shadow-lg hover:bg-[#7736FB]/30 hover:scale-105 transition-all duration-300`}
+  >
+    <Handshake className="w-4 h-4 mr-2" />
+    Friends
+  </button>
+</div>
       </div>
 
       {/* Search Section */}
@@ -392,12 +388,12 @@ useEffect(() => {
                       {/* Avatar */}
                       <div className="relative">
                         <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#7736FB] to-[#4F7CFF] flex items-center justify-center text-white text-xl font-bold">
-                          {room.friend?.name?.charAt(0)?.toUpperCase()}
+                          {room?.friend?.name?.charAt(0)?.toUpperCase()}
                         </div>
 
                         <span
                           className={`absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-white ${
-                            room.friend?.isOnline
+                            room?.friend?.isOnline
                               ? "bg-green-500"
                               : "bg-gray-400"
                           }`}
@@ -407,43 +403,27 @@ useEffect(() => {
                       {/* Name */}
                       <div>
                         <h2 className="font-bold text-lg text-gray-800">
-                          {room.friend?.name}
+                          {room?.friend?.name}
                         </h2>
 
                         <p
                           className={`text-sm ${
-                            room.friend?.isOnline
+                            room?.friend?.isOnline
                               ? "text-green-500 font-medium"
                               : "text-gray-500"
                           }`}
                         >
-                          {room.friend?.isOnline
+                          {room?.friend?.isOnline
                             ? "Online"
-                            : `Last seen ${date(room?.friend?.lastSeen)}`}
-
-                          {/*                             
-                            `Last seen ${new Date(
-                                room.friend?.lastSeen,
-                              ).toLocaleDateString("en-IN", {
-                                day: "numeric",
-
-                                month: "short",
-                                hour: "numeric",
-                                minute: "2-digit",
-                              })}`} */}
+                            : ` ${FormatLastSeen(room?.friend?.lastSeen)}`}
                         </p>
                       </div>
                     </div>
-
-                    {/* Chat Button */}
-                    <button className="opacity-0 group-hover:opacity-100 transition-all">
-                      <MessageSquareText className="text-[#7736FB]" size={22} />
-                    </button>
                   </div>
                 </div>
               ))}
             </div>
-          ) :selectedFilter==="all" && allUsers.length > 0 ? (
+          ) : selectedFilter === "all" && allUsers.length > 0 ? (
             allUsers.map((user, index) => (
               <div
                 key={user.id || index}
@@ -481,76 +461,35 @@ useEffect(() => {
                       <h3 className="font-bold text-gray-800 group-hover:text-blue-600 transition-colors">
                         {user.name || user?.friendId?.name}
                       </h3>
-                      {/* <div
-                        className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getBadgeColor(user.isOnline)} border`}
-                      >
-                        
-                        <span>{user.isOnline}</span>
-                      </div> */}
                     </div>
                     {/* Activity or last seen */}
-                    <p className="text-sm text-gray-500 flex items-center gap-1">
-                      {user.status === "online" ? (
+                    <p
+                      className={`text-sm flex items-center gap-1 ${
+                        user.isOnline ? "text-green-500" : "text-gray-500"
+                      }`}
+                    >
+                      {user.isOnline ? (
                         <>
-                          <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
-                          <span>Typing...</span>
+                          <span>Online</span>
                         </>
                       ) : (
-                        user.lastSeen || "Last seen recently"
+                        <span>{FormatLastSeen(user.lastSeen)}</span>
                       )}
                     </p>
-                    {/* Tags/Metadata */}
-                    <div className="flex items-center gap-2 mt-2">
-                      {user.isPro && (
-                        <span className="px-2 py-0.5 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-600 rounded-full text-xs font-medium border border-purple-200">
-                          ⚡ Pro
-                        </span>
-                      )}
-                      {user.isVerified && (
-                        <span className="px-2 py-0.5 bg-blue-100 text-blue-600 rounded-full text-xs font-medium border border-blue-200">
-                          ✓ Verified
-                        </span>
-                      )}
-                    </div>
                   </div>
 
-                  {/* Action Button with animation */}
-                  {selectedFilter === "friends" && (
-                    <button className="absolute right-4 opacity-70 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0">
-                      <div
-                        title={"Start Chat"}
-                        className="text-red-500 p-3 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:scale-110"
-                      >
-                        <MessageSquareText className="w-4 h-4" />
-                      </div>
-                    </button>
-                  )}
-
-                  {selectedFilter !== "friends" && (
+                  {selectedFilter !== "friends" && !user?.isFriend && (
                     <button
-                      onClick={
-                        !user?.isFriend ? () => handleAddFriend(user._id) : null
-                      }
+                      onClick={() => handleAddFriend(user._id)}
                       className="absolute right-4 opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0"
+                      title="Add Friend"
                     >
-                      <div
-                        title={user?.isFriend ? "Start Chat" : "Add Friend"}
-                        className=" text-red-500 p-3 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:scale-110"
-                      >
-                        {user?.isFriend ? (
-                          <MessageSquareText className="w-4 h-4" />
-                        ) : (
-                          <UserPlus2 className="w-4 h-4" />
-                        )}
+                      <div className="text-[#7736FB] p-3 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:scale-110">
+                        <UserPlus2 className="w-4 h-4" />
                       </div>
                     </button>
                   )}
                 </div>
-
-                {/* Progress/Activity bar (optional) */}
-                {user.status === "online" && (
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-green-400 to-blue-500 rounded-b-2xl animate-slide"></div>
-                )}
               </div>
             ))
           ) : (
@@ -563,6 +502,7 @@ useEffect(() => {
                 </div>
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-2">
+                {selectedFilter==="all"?"No Users":"Add user as friend from all users list"}
                 No users found
               </h3>
               <p className="text-gray-500 max-w-[220px]">
@@ -599,12 +539,7 @@ useEffect(() => {
                 {awayCount?.length} away
               </span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2.5 h-2.5 bg-gradient-to-r from-gray-400 to-gray-500 rounded-full"></div>
-              <span className="text-sm font-medium text-gray-700">
-                {offlineCount} offline
-              </span>
-            </div>
+           
           </div>
           <div className="flex items-center gap-1 text-sm">
             <span className="font-bold text-blue-600">{allUsers.length}</span>

@@ -15,6 +15,14 @@ const [currentPartner,setCurrentPartner]=useState(()=>{
   return availablePartner?JSON.parse(availablePartner):{type:"public"}
 })
   
+
+const [friendRoom,setFriendRoom]=useState(()=>{
+
+  const availableFriends=localStorage.getItem("friendRoom")
+  return availableFriends?JSON.parse(availableFriends):[]
+})
+
+
   const [roomType, setRoomType] = useState(() => {
     const availableRoomType = localStorage.getItem("roomType");
     return availableRoomType ? availableRoomType : "public";
@@ -58,6 +66,12 @@ localStorage.setItem("currentPartner",JSON.stringify(data))
 
 }
 
+const handleFriendRoom=(data,initial)=>{
+setFriendRoom(data)
+localStorage.setItem("friendRoom",JSON.stringify(data))
+
+}
+
 const handleRoomTypeChange = (newRoomType) => {
   
     setRoomType(newRoomType);
@@ -77,7 +91,7 @@ const handleRoomTypeChange = (newRoomType) => {
   };
 
   return (
-    <AuthContext.Provider value={{ userData, chatRoomId,roomType,setRoomType, login,handleRoomTypeChange, logout,handleChatRoomIdChange,handlePartnerChange,currentPartner }}>
+    <AuthContext.Provider value={{ userData,friendRoom,handleFriendRoom, chatRoomId,roomType,setRoomType, login,handleRoomTypeChange, logout,handleChatRoomIdChange,handlePartnerChange,currentPartner }}>
       {children}
     </AuthContext.Provider>
   );

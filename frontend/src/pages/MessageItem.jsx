@@ -2,7 +2,7 @@
 
 
 import React, { useState, useEffect } from "react";
-import { getTimeFormat } from "../utilityFuntions/getTimeFormat";
+import { FormatLastSeen } from "../utilityFuntions/FormatLastSeen";
 
 const Lightbox = ({ images, startIndex, onClose }) => {
   const [index, setIndex] = useState(startIndex);
@@ -101,6 +101,13 @@ const MessageItem = ({ msg, currentUser, prevMessage }) => {
     setLightboxStart(startIndex); // Fixed: use the actual clicked index
     setLightboxOpen(true);
   };
+  const formatMessageTime = (date) => {
+  return new Date(date).toLocaleTimeString("en-IN", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+};
 
   const renderImageGrid = () => {
     if (images.length === 0) return null;
@@ -200,7 +207,7 @@ const MessageItem = ({ msg, currentUser, prevMessage }) => {
 
             <div className={`${isCurrentUser ? "flex-row" : "flex-row-reverse"} group flex items-center gap-1`}>
               <span className="text-xs opacity-0 group-hover:opacity-100 text-gray-500 mt-1 px-1 transition-opacity">
-                {getTimeFormat(msg?.createdAt)}
+              {formatMessageTime(msg?.createdAt)}
               </span>
 
               <div className={`px-4 py-2 rounded-lg shadow-sm max-w-full ${
